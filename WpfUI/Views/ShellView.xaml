@@ -30,5 +30,8 @@
 
         <Button x:Name="LoadDish" Grid.Row="1" Grid.Column="1">Load dish</Button>
 
+        <ContentControl Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="4" 
+               Grid.RowSpan="6" x:Name="ActiveItem"/>
+
     </Grid>
 </Window>

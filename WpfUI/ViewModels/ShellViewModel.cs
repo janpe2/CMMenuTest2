@@ -10,7 +10,8 @@ namespace WpfUI.ViewModels
     {
         public void LoadDish()
         {
-            MessageBox.Show("Abc");
+            //MessageBox.Show("Loading dish");
+            ActivateItemAsync(new DishViewModel(), System.Threading.CancellationToken.None);
         }
     }
 }
