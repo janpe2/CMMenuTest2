@@ -5,12 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.Views"
         mc:Ignorable="d"
-        Title="ShellView" Height="287" Width="482">
+        Title="Menu Master" Height="287" Width="482">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
@@ -20,18 +18,18 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <Button x:Name="LoadDish" Grid.Row="1" Grid.Column="1">Load dish</Button>
+        <Button x:Name="LoadDish" Grid.Row="1" Grid.Column="1" Margin="5">Load dish</Button>
 
-        <ContentControl Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="4" 
-               Grid.RowSpan="6" x:Name="ActiveItem"/>
+        <ComboBox x:Name="DishesList" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="1" Margin="5"
+                  SelectedItem="{Binding Path=SelectedDish, Mode=TwoWay}"
+                  DisplayMemberPath="Name"/>
+
+        <ContentControl Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" 
+               Grid.RowSpan="3" x:Name="ActiveItem"/>
 
     </Grid>
 </Window>
