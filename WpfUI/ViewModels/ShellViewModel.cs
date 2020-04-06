@@ -3,43 +3,41 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using WpfUI.MenuLibrary;
 using WpfUI.Models;
 
 namespace WpfUI.ViewModels
 {
     public class ShellViewModel : Conductor<object>
     {
-        public BindableCollection<DishModel> DishesList { get; } = new BindableCollection<DishModel>
-        {
-            new DishModel("Kalakeitto", "Perunaa, haukea ja kermaa", 10.95),
-            new DishModel("Pippuripihvi", "Naudanpihvi ja pippuria", 12.85),
-            new DishModel("Hernekeitto", "Herneitä ja vettä", 9.55)
-        };
-
-        private DishModel _selectedDish;
-        public DishModel SelectedDish 
-        { 
-            get 
-            { 
-                return _selectedDish; 
-            }
-            set 
-            {
-                _selectedDish = value;
-                LoadDish();
-            }
-        }
+        private MenuManager menuManager = new MenuManager();
 
         public ShellViewModel()
         {
-            SelectedDish = DishesList[0];
+            menuManager.LoadSampleData();
         }
 
-        public void LoadDish()
+        public void ShowDishes()
         {
-            //MessageBox.Show("Loading dish");
-            DishViewModel dvm = new DishViewModel(SelectedDish);
-            ActivateItemAsync(dvm, System.Threading.CancellationToken.None);
+            try
+            {
+                DishViewModel dvm = new DishViewModel(menuManager);
+                ActivateItemAsync(dvm, System.Threading.CancellationToken.None);
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show("Error: " + e);
+            }
+        }
+
+        public void ShowMenus()
+        {
+            
+        }
+
+        public void ShowCategories()
+        {
+
         }
     }
 }

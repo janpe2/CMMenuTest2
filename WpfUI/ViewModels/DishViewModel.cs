@@ -2,32 +2,63 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using WpfUI.MenuLibrary;
 using WpfUI.Models;
 
 namespace WpfUI.ViewModels
 {
     public class DishViewModel : Screen
     {
-        public DishModel TheDish { get; set; } 
+        public MenuManager TheMenuManager { get; set; }
 
-        public string NameOfSelectedDish 
+        private BindableCollection<Dish> _dishes = new BindableCollection<Dish>();
+        public BindableCollection<Dish> Dishes 
         { 
-            get { return TheDish.Name; }
+            get
+            {
+                return _dishes;
+            }
+        }
+
+        private Dish _selectedDish;
+        public Dish SelectedDish 
+        { 
+            get
+            {
+                return _selectedDish;
+            }
+            set
+            {
+                _selectedDish = value;
+                NotifyOfPropertyChange(() => NameOfSelectedDish);
+                NotifyOfPropertyChange(() => PriceOfSelectedDish);
+                NotifyOfPropertyChange(() => DescriptionOfSelectedDish);
+            }
+        }
+
+        public string NameOfSelectedDish
+        {
+            get { return SelectedDish.Name; }
         }
 
         public string PriceOfSelectedDish
         {
-            get { return $"{TheDish.Price} euroa"; }
+            get { return $"{SelectedDish.Price} euroa"; }
         }
 
         public string DescriptionOfSelectedDish
         {
-            get { return TheDish.Description; }
+            get { return SelectedDish.Description; }
         }
 
-        public DishViewModel(DishModel d)
+        public DishViewModel(MenuManager m)
         {
-            TheDish = d;
+            TheMenuManager = m;
+            _dishes.AddRange(m.AllDishes);
+            if (m.AllDishes.Count > 0)
+            {
+                SelectedDish = m.AllDishes[0];
+            }
         }
     }
 }

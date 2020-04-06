@@ -18,18 +18,19 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <Button x:Name="LoadDish" Grid.Row="1" Grid.Column="1" Margin="5">Load dish</Button>
+        <Button x:Name="ShowDishes" Grid.Row="1" Grid.Column="1" Margin="5">Show Dishes</Button>
 
-        <ComboBox x:Name="DishesList" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="1" Margin="5"
-                  SelectedItem="{Binding Path=SelectedDish, Mode=TwoWay}"
-                  DisplayMemberPath="Name"/>
+        <Button x:Name="ShowMenus" Grid.Row="2" Grid.Column="1" Margin="5">Show Menus</Button>
+
+        <Button x:Name="ShowCategories" Grid.Row="3" Grid.Column="1" Margin="5">Show Categories</Button>
 
         <ContentControl Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" 
-               Grid.RowSpan="3" x:Name="ActiveItem"/>
+               Grid.RowSpan="4" x:Name="ActiveItem"/>
 
     </Grid>
 </Window>
