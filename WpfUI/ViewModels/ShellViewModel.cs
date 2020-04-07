@@ -19,15 +19,8 @@ namespace WpfUI.ViewModels
 
         public void ShowDishes()
         {
-            try
-            {
-                DishViewModel dvm = new DishViewModel(menuManager);
-                ActivateItemAsync(dvm, System.Threading.CancellationToken.None);
-            }
-            catch(Exception e)
-            {
-                MessageBox.Show("Error: " + e);
-            }
+            DishViewModel dvm = new DishViewModel(menuManager);
+            ActivateItemAsync(dvm, System.Threading.CancellationToken.None);
         }
 
         public void ShowMenus()
