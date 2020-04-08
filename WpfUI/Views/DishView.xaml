@@ -4,16 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfUI.Views"
-             mc:Ignorable="d">
-    <UserControl.Background>
-        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-            <GradientStop Color="#FF6490AE"/>
-            <GradientStop Color="White" Offset="1"/>
-        </LinearGradientBrush>
-    </UserControl.Background>
+             mc:Ignorable="d" Background="#FFE2E7F0">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
@@ -26,31 +21,64 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="15"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
+        
+        <!-- Row 1 -->
 
+        <!-- This combo box is disabled if there are unsaved changes -->
         <ComboBox x:Name="Dishes" Grid.Row="1" Grid.Column="1" DisplayMemberPath="Name"
-                  SelectedItem="{Binding Path=SelectedDish, Mode=TwoWay}" Margin="0,0,0,3"
-                  Grid.ColumnSpan="3"/>
+                  SelectedItem="{Binding Path=SelectedDish, Mode=TwoWay}" Margin="0,0,3,3"
+                  Grid.ColumnSpan="4" IsEnabled="{Binding IsSelectedDishSaved}"/>
+
+        <!-- Row 2 -->
 
         <TextBlock Text="Name:" Grid.Row="2" Grid.Column="1"/>
         <TextBox Grid.Row="2" Grid.Column="2" x:Name="NameOfSelectedDish" Text="Nimi" 
                  FontWeight="Bold" Grid.ColumnSpan="3" Margin="3" />
 
+        <!-- Row 3 -->
+        
         <TextBlock Text="Description:" Grid.Row="3" Grid.Column="1"/>
         <TextBox Grid.Row="3" Grid.Column="2" x:Name="DescriptionOfSelectedDish" 
                  Text="Kuvausteksti" Grid.ColumnSpan="3" Margin="3"/>
 
+        <!-- Row 4 -->
+        
         <TextBlock Text="Price:" Grid.Row="4" Grid.Column="1"/>
         <TextBox Grid.Row="4" Grid.Column="2" x:Name="PriceOfSelectedDish" 
                  Text="0,00" Grid.ColumnSpan="3" Margin="3" />
 
-        <Button Grid.Row="6" Grid.Column="1" x:Name="SaveChanges" Content="Save Changes" Margin="3"/>
-        <Button Grid.Row="6" Grid.Column="2" x:Name="DeleteDish" Content="Delete Dish" Margin="3"/>
-        <Button Grid.Row="6" Grid.Column="3" x:Name="AddDish" Content="Add New Dish" Margin="3"/>
+        <!-- Row 5 -->
+        
+        <GroupBox Header="Dietary Info" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Vertical">
+                <CheckBox Content="Contains lactose" x:Name="SelectedDishContainsLactose"/>
+                <CheckBox Content="Contains gluten" x:Name="SelectedDishContainsGluten"/>
+                <CheckBox Content="Contains fish" x:Name="SelectedDishContainsFish"/>
+            </StackPanel>
+        </GroupBox>
+        
+        <!-- Row 6 is an empty gap. -->
+
+        <!-- Row 7 -->
+
+        <Button Grid.Row="7" Grid.Column="1" x:Name="SaveChanges" Content="Save Changes" Margin="3"
+                IsEnabled="{Binding SelectedDishModified}" Padding="3"/>
+        <Button Grid.Row="7" Grid.Column="2" x:Name="DiscardChanges" Content="Discard Changes" Margin="3"
+                IsEnabled="{Binding SelectedDishModified}" Padding="3"/>
+        <Button Grid.Row="7" Grid.Column="3" x:Name="DeleteDish" Content="Delete Dish" Margin="3" Padding="3"/>
+        <Button Grid.Row="7" Grid.Column="4" x:Name="AddDish" Content="Add New Dish" Margin="3" Padding="3"/>
+
+        <!-- Row 8 -->
+        
+        <TextBlock Grid.Row="8" Grid.Column="1" x:Name="SelectedDishModifiedText" 
+                  Foreground="{Binding SelectedDishModifiedColor}" Margin="3" />
 
     </Grid>
 </UserControl>
