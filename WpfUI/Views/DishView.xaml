@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfUI.Views"
              mc:Ignorable="d" Background="#FFE2E7F0">
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
@@ -34,25 +35,25 @@
         <!-- This combo box is disabled if there are unsaved changes -->
         <ComboBox x:Name="Dishes" Grid.Row="1" Grid.Column="1" DisplayMemberPath="Name"
                   SelectedItem="{Binding Path=SelectedDish, Mode=TwoWay}" Margin="0,0,3,3"
-                  Grid.ColumnSpan="4" IsEnabled="{Binding IsSelectedDishSaved}"/>
+                  Grid.ColumnSpan="5" IsEnabled="{Binding IsSelectedDishSaved}"/>
 
         <!-- Row 2 -->
 
         <TextBlock Text="Name:" Grid.Row="2" Grid.Column="1"/>
-        <TextBox Grid.Row="2" Grid.Column="2" x:Name="NameOfSelectedDish" Text="Nimi" 
-                 FontWeight="Bold" Grid.ColumnSpan="3" Margin="3" />
+        <TextBox Grid.Row="2" Grid.Column="2" x:Name="NameOfSelectedDish" Text="Default name" 
+                 FontWeight="Bold" Grid.ColumnSpan="4" Margin="3" />
 
         <!-- Row 3 -->
         
         <TextBlock Text="Description:" Grid.Row="3" Grid.Column="1"/>
         <TextBox Grid.Row="3" Grid.Column="2" x:Name="DescriptionOfSelectedDish" 
-                 Text="Kuvausteksti" Grid.ColumnSpan="3" Margin="3"/>
+                 Text="Default description" Grid.ColumnSpan="4" Margin="3"/>
 
         <!-- Row 4 -->
         
         <TextBlock Text="Price:" Grid.Row="4" Grid.Column="1"/>
         <TextBox Grid.Row="4" Grid.Column="2" x:Name="PriceOfSelectedDish" 
-                 Text="0,00" Grid.ColumnSpan="3" Margin="3" />
+                 Text="0,00" Grid.ColumnSpan="4" Margin="3" />
 
         <!-- Row 5 -->
         
@@ -68,8 +69,27 @@
 
         <!-- Row 7 -->
 
-        <Button Grid.Row="7" Grid.Column="1" x:Name="SaveChanges" Content="Save Changes" Margin="3"
-                IsEnabled="{Binding SelectedDishModified}" Padding="3"/>
+        <Button Grid.Row="7" Grid.Column="1" x:Name="SaveChanges" Margin="3"
+                IsEnabled="{Binding SelectedDishModified}" Padding="3">
+            <StackPanel Orientation="Horizontal">
+                <Image>
+                    <!-- Change button's image automatically based on its IsEnabled value -->
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Value="True">
+                                    <Setter Property="Source" Value="Images\exclam_red.png" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Value="False">
+                                    <Setter Property="Source" Value="Images\check_green.png" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+                <TextBlock Margin="3,0,0,0">Save Changes</TextBlock>
+            </StackPanel>
+        </Button>
         <Button Grid.Row="7" Grid.Column="2" x:Name="DiscardChanges" Content="Discard Changes" Margin="3"
                 IsEnabled="{Binding SelectedDishModified}" Padding="3"/>
         <Button Grid.Row="7" Grid.Column="3" x:Name="DeleteDish" Content="Delete Dish" Margin="3" Padding="3"/>

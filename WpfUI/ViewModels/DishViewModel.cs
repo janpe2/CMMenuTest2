@@ -47,7 +47,10 @@ namespace WpfUI.ViewModels
         private string _nameOfSelectedDish;
         public string NameOfSelectedDish
         {
-            get { return _nameOfSelectedDish; }
+            get 
+            { 
+                return _nameOfSelectedDish; 
+            }
             set
             {
                 _nameOfSelectedDish = value;
@@ -59,7 +62,10 @@ namespace WpfUI.ViewModels
         private string _priceOfSelectedDish;
         public string PriceOfSelectedDish
         {
-            get { return _priceOfSelectedDish;  } 
+            get 
+            { 
+                return _priceOfSelectedDish;  
+            } 
             set
             {
                 _priceOfSelectedDish = value;
@@ -71,7 +77,10 @@ namespace WpfUI.ViewModels
         private string _descriptionOfSelectedDish;
         public string DescriptionOfSelectedDish
         {
-            get { return _descriptionOfSelectedDish;  }
+            get 
+            { 
+                return _descriptionOfSelectedDish;  
+            }
             set
             {
                 _descriptionOfSelectedDish = value;
@@ -83,7 +92,10 @@ namespace WpfUI.ViewModels
         private bool _selectedDishContainsLactose;
         public bool SelectedDishContainsLactose
         {
-            get { return _selectedDishContainsLactose; }
+            get 
+            { 
+                return _selectedDishContainsLactose; 
+            }
             set 
             { 
                 _selectedDishContainsLactose = value;
@@ -95,7 +107,10 @@ namespace WpfUI.ViewModels
         private bool _selectedDishContainsGluten;
         public bool SelectedDishContainsGluten
         {
-            get { return _selectedDishContainsGluten; }
+            get 
+            { 
+                return _selectedDishContainsGluten; 
+            }
             set 
             { 
                 _selectedDishContainsGluten = value;
@@ -107,7 +122,10 @@ namespace WpfUI.ViewModels
         private bool _selectedDishContainsFish;
         public bool SelectedDishContainsFish
         {
-            get { return _selectedDishContainsFish; }
+            get 
+            { 
+                return _selectedDishContainsFish; 
+            }
             set 
             { 
                 _selectedDishContainsFish = value;
@@ -119,7 +137,10 @@ namespace WpfUI.ViewModels
         private bool _selectedDishModified;
         public bool SelectedDishModified
         {
-            get { return _selectedDishModified; }
+            get 
+            { 
+                return _selectedDishModified; 
+            }
             set
             {
                 _selectedDishModified = value;
@@ -127,16 +148,37 @@ namespace WpfUI.ViewModels
                 NotifyOfPropertyChange(() => IsSelectedDishSaved);
 
                 SelectedDishModifiedText = value ? "Modified" : "Saved";
-                NotifyOfPropertyChange(() => SelectedDishModifiedText);
-
                 SelectedDishModifiedColor = value ? "Red" : "Green";
-                NotifyOfPropertyChange(() => SelectedDishModifiedColor);
             }
         }
 
-        public string SelectedDishModifiedText { get; set; } = "Saved";
+        private string _selectedDishModifiedText = "Saved";
+        public string SelectedDishModifiedText 
+        { 
+            get
+            {
+                return _selectedDishModifiedText;
+            }
+            set
+            {
+                _selectedDishModifiedText = value;
+                NotifyOfPropertyChange(() => SelectedDishModifiedText);
+            }
+        }
 
-        public string SelectedDishModifiedColor { get; set; } = "Green";
+        private string _selectedDishModifiedColor = "Green";
+        public string SelectedDishModifiedColor 
+        {
+            get
+            {
+                return _selectedDishModifiedColor;
+            }
+            set
+            {
+                _selectedDishModifiedColor = value;
+                NotifyOfPropertyChange(() => SelectedDishModifiedColor);
+            }
+        }
 
         /// <summary>
         /// Read-only inversion of SelectedDishModified.
@@ -208,12 +250,11 @@ namespace WpfUI.ViewModels
                 return;
             }
             MessageBoxResult messageBoxResult = MessageBox.Show(
-                $"Do you really want to discard changes of dish '{NameOfSelectedDish}'?",
+                $"Do you really want to discard all changes you made to dish '{NameOfSelectedDish}'?",
                 "Discard Changes?", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                SelectedDishModified = false;
-                NotifyOfPropertyChange(() => SelectedDish);
+                SelectedDish = _selectedDish; // to notify all
             }
         }
 
