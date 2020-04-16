@@ -18,6 +18,9 @@ namespace WpfUI.MenuLibrary
 
         public bool ContainsFish { get; set; }
 
+        // TODO ?
+        public List<string> CategoryNames { get; } = new List<string>(MenuCategory.CategoryNames);
+
         public Dish(string name, string descr, double price)
         {
             Name = name;

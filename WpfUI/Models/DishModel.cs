@@ -8,17 +8,20 @@ namespace WpfUI.Models
 {
     public class DishModel
     {
-        private BindableCollection<Dish> dishes = new BindableCollection<Dish>();
-
         public string Name { get; set; }
 
         public double Price { get; set; }
 
         public string Description { get; set; }
 
-        public DishModel(List<Dish> d)
+        private static List<string> _categoryNames = new List<string>(MenuCategory.CategoryNames);
+        public List<string> CategoryNames { get; } = _categoryNames;
+
+        public DishModel(Dish d)
         {
-            dishes.AddRange(d);
+            Name = d.Name;
+            Price = d.Price;
+            Description = d.Description;
         }
     }
 }

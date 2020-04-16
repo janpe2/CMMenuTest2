@@ -25,12 +25,17 @@ namespace WpfUI.ViewModels
 
         public void ShowMenus()
         {
-            
         }
 
         public void ShowCategories()
         {
+            CategoryViewModel dvm = new CategoryViewModel(menuManager);
+            ActivateItemAsync(dvm, System.Threading.CancellationToken.None);
+        }
 
+        public void ExitApplication()
+        {
+            Application.Current.Shutdown();
         }
     }
 }

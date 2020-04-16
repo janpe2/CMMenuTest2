@@ -6,6 +6,17 @@ namespace WpfUI.MenuLibrary
 {
     public class MenuCategory
     {
+		public enum Category
+		{
+			Starter,
+			Main,
+			Dessert,
+			Drink,
+			Uncategorized
+		}
+
+		public static string[] CategoryNames = Enum.GetNames(typeof(Category));		
+
 		/// <summary>
 		/// Name of the category.
 		/// </summary>
@@ -19,6 +30,7 @@ namespace WpfUI.MenuLibrary
 		public MenuCategory(string name)
 		{
 			this.Name = name;
+			
 		}
 
 	}
