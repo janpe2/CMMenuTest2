@@ -23,6 +23,8 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="15"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -32,32 +34,42 @@
         
         <!-- Row 1 -->
 
-        <!-- This combo box is disabled if there are unsaved changes -->
-        <ComboBox x:Name="Dishes" Grid.Row="1" Grid.Column="1" DisplayMemberPath="Name"
-                  SelectedItem="{Binding Path=SelectedDish, Mode=TwoWay}" Margin="0,0,3,3"
-                  Grid.ColumnSpan="5" IsEnabled="{Binding IsSelectedDishSaved}"/>
+        <TextBlock Text="Dish:" Grid.Row="1" Grid.Column="1" Margin="0,0,0,3"/>
 
         <!-- Row 2 -->
 
-        <TextBlock Text="Name:" Grid.Row="2" Grid.Column="1"/>
-        <TextBox Grid.Row="2" Grid.Column="2" x:Name="NameOfSelectedDish" Text="Default name" 
-                 FontWeight="Bold" Grid.ColumnSpan="4" Margin="3" />
+        <!-- This combo box is disabled if there are unsaved changes -->
+        <ComboBox x:Name="Dishes" Grid.Row="2" Grid.Column="1" DisplayMemberPath="Name"
+                  SelectedItem="{Binding Path=SelectedDish, Mode=TwoWay}" Margin="0,0,3,3"
+                  Grid.ColumnSpan="5" IsEnabled="{Binding IsSelectedDishSaved}"/>
 
         <!-- Row 3 -->
-        
-        <TextBlock Text="Description:" Grid.Row="3" Grid.Column="1"/>
-        <TextBox Grid.Row="3" Grid.Column="2" x:Name="DescriptionOfSelectedDish" 
-                 Text="Default description" Grid.ColumnSpan="4" Margin="3"/>
+
+        <TextBlock Text="Name:" Grid.Row="3" Grid.Column="1"/>
+        <TextBox Grid.Row="3" Grid.Column="2" x:Name="NameOfSelectedDish" Text="Default name" 
+                 FontWeight="Bold" Grid.ColumnSpan="4" Margin="3" />
 
         <!-- Row 4 -->
         
-        <TextBlock Text="Price:" Grid.Row="4" Grid.Column="1"/>
-        <TextBox Grid.Row="4" Grid.Column="2" x:Name="PriceOfSelectedDish" 
-                 Text="0,00" Grid.ColumnSpan="4" Margin="3" />
+        <TextBlock Text="Description:" Grid.Row="4" Grid.Column="1"/>
+        <TextBox Grid.Row="4" Grid.Column="2" x:Name="DescriptionOfSelectedDish" 
+                 Text="Default description" Grid.ColumnSpan="4" Margin="3"/>
 
         <!-- Row 5 -->
         
-        <GroupBox Header="Dietary Info" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2">
+        <TextBlock Text="Price:" Grid.Row="5" Grid.Column="1"/>
+        <TextBox Grid.Row="5" Grid.Column="2" x:Name="PriceOfSelectedDish" 
+                 Text="0,00" Grid.ColumnSpan="4" Margin="3" />
+
+        <!-- Row 6 -->
+
+        <TextBlock Text="Category:" Grid.Row="6" Grid.Column="1"/>
+        <ComboBox x:Name="AvailableCategories" Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="4"
+                  SelectedItem="{Binding Path=CategoryOfSelectedDish, Mode=OneWay}" Margin="3" />
+
+        <!-- Row 7 -->
+        
+        <GroupBox Header="Dietary Info" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Padding="3" BorderBrush="#FF546772">
             <StackPanel Orientation="Vertical">
                 <CheckBox Content="Contains lactose" x:Name="SelectedDishContainsLactose"/>
                 <CheckBox Content="Contains gluten" x:Name="SelectedDishContainsGluten"/>
@@ -65,11 +77,11 @@
             </StackPanel>
         </GroupBox>
         
-        <!-- Row 6 is an empty gap. -->
+        <!-- Row 8 is an empty gap. -->
 
-        <!-- Row 7 -->
+        <!-- Row 9 -->
 
-        <Button Grid.Row="7" Grid.Column="1" x:Name="SaveChanges" Margin="3"
+        <Button Grid.Row="9" Grid.Column="1" x:Name="SaveChanges" Margin="3"
                 IsEnabled="{Binding SelectedDishModified}" Padding="3">
             <StackPanel Orientation="Horizontal">
                 <Image>
@@ -90,14 +102,14 @@
                 <TextBlock Margin="3,0,0,0">Save Changes</TextBlock>
             </StackPanel>
         </Button>
-        <Button Grid.Row="7" Grid.Column="2" x:Name="DiscardChanges" Content="Discard Changes" Margin="3"
+        <Button Grid.Row="9" Grid.Column="2" x:Name="DiscardChanges" Content="Discard Changes" Margin="3"
                 IsEnabled="{Binding SelectedDishModified}" Padding="3"/>
-        <Button Grid.Row="7" Grid.Column="3" x:Name="DeleteDish" Content="Delete Dish" Margin="3" Padding="3"/>
-        <Button Grid.Row="7" Grid.Column="4" x:Name="AddDish" Content="Add New Dish" Margin="3" Padding="3"/>
+        <Button Grid.Row="9" Grid.Column="3" x:Name="DeleteDish" Content="Delete Dish" Margin="3" Padding="3"/>
+        <Button Grid.Row="9" Grid.Column="4" x:Name="AddDish" Content="Add New Dish" Margin="3" Padding="3"/>
 
-        <!-- Row 8 -->
+        <!-- Row 10 -->
         
-        <TextBlock Grid.Row="8" Grid.Column="1" x:Name="SelectedDishModifiedText" 
+        <TextBlock Grid.Row="10" Grid.Column="1" x:Name="SelectedDishModifiedText" Text="Modified"
                   Foreground="{Binding SelectedDishModifiedColor}" Margin="3" />
 
     </Grid>

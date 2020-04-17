@@ -8,7 +8,14 @@ namespace WpfUI.MenuLibrary
     {
         public List<Dish> AllDishes { get; set; } = new List<Dish>();
 
-        public List<MenuCategory> AllCategories { get; set; } = new List<MenuCategory>();
+        public List<MenuCategory> AllCategories { get; set; } = new List<MenuCategory>()
+        {
+            new MenuCategory(MenuCategory.Category.Starter),
+            new MenuCategory(MenuCategory.Category.Main),
+            new MenuCategory(MenuCategory.Category.Dessert),
+            new MenuCategory(MenuCategory.Category.Drink),
+            new MenuCategory(MenuCategory.Category.Uncategorized),
+        };
 
         public List<Menu> AllMenus { get; set; } = new List<Menu>();
 
@@ -29,7 +36,21 @@ namespace WpfUI.MenuLibrary
             AddDish(Menu.Category.MainCourse, "Pekonipihvi", "Naudan pihvi ja pekonia", 17.95, menu2, false, false, false);
         }
 
-        public void AddDish(Menu.Category category, string name, string descr, double price, Menu menu,
+        internal MenuCategory.Category GetCategoryOfDish(Dish dish)
+        {
+            // TODO This doesn't work if a dish can exist in more than one categories.
+
+            foreach (var cat in AllCategories)
+            {
+                if (cat.Dishes.Contains(dish))
+                {
+                    return cat.Id;
+                }
+            }
+            return MenuCategory.Category.Starter; // TODO
+        }
+
+        public Dish AddDish(Menu.Category category, string name, string descr, double price, Menu menu,
             bool lactose, bool gluten, bool fish)
         {
             Dish dish = new Dish(name, descr, price);
@@ -37,7 +58,12 @@ namespace WpfUI.MenuLibrary
             dish.ContainsGluten = gluten;
             dish.ContainsFish = fish;
             //menu.AddDish();
+
             AllDishes.Add(dish);
+
+            AllCategories[(int)category].AddDish(dish);
+
+            return dish;
         }
 
     }

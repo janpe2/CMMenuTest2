@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfUI.Views"
         mc:Ignorable="d"
-        Title="Menu Master" Height="364" Width="635" WindowStartupLocation="CenterScreen">
+        Title="Menu Master" Height="447" Width="714" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
@@ -26,7 +26,7 @@
         </Grid.RowDefinitions>
 
         <Button x:Name="ShowDishes" Grid.Row="1" Grid.Column="1" Margin="5" Padding="3">Edit Dishes</Button>
-        
+
         <Button x:Name="ShowCategories" Grid.Row="2" Grid.Column="1" Margin="5" Padding="3">Edit Categories</Button>
 
         <Button x:Name="ShowMenus" Grid.Row="3" Grid.Column="1" Margin="5" Padding="3">Edit Menus</Button>

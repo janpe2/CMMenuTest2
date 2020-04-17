@@ -27,11 +27,17 @@ namespace WpfUI.MenuLibrary
 		/// </summary>
 		public List<Dish> Dishes { get; } = new List<Dish>();
 
-		public MenuCategory(string name)
+		public Category Id { get; set; }
+
+		public MenuCategory(Category id)
 		{
-			this.Name = name;
-			
+			this.Id = id;
+			this.Name = id.ToString();
 		}
 
-	}
+        public void AddDish(Dish dish)
+        {
+            Dishes.Add(dish);
+        }
+    }
 }

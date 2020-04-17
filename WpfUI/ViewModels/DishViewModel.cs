@@ -31,15 +31,40 @@ namespace WpfUI.ViewModels
             set
             {
                 _selectedDish = value;
+
+                string name, descr, price;
+                bool lactose, gluten, fish;
+                MenuCategory.Category cat;
+
+                if (_selectedDish == null)
+                {
+                    name = "";
+                    price = "";
+                    descr = "";
+                    lactose = false;
+                    gluten = false;
+                    fish = false;
+                    cat = MenuCategory.Category.Starter;
+                }
+                else
+                {
+                    name = _selectedDish.Name;
+                    price = $"{_selectedDish.Price}";
+                    descr = _selectedDish.Description;
+                    lactose = _selectedDish.ContainsLactose;
+                    gluten = _selectedDish.ContainsGluten;
+                    fish = _selectedDish.ContainsFish;
+                    cat = TheMenuManager.GetCategoryOfDish(_selectedDish);
+                }
+
                 NotifyOfPropertyChange(() => SelectedDish);
-                NameOfSelectedDish = _selectedDish.Name;
-                PriceOfSelectedDish = $"{_selectedDish.Price}";
-                DescriptionOfSelectedDish = _selectedDish.Description;
-
-                SelectedDishContainsLactose = _selectedDish.ContainsLactose;
-                SelectedDishContainsGluten = _selectedDish.ContainsGluten;
-                SelectedDishContainsFish = _selectedDish.ContainsFish;
-
+                NameOfSelectedDish = name;
+                PriceOfSelectedDish = price;
+                DescriptionOfSelectedDish = descr;
+                CategoryOfSelectedDish = cat.ToString();
+                SelectedDishContainsLactose = lactose;
+                SelectedDishContainsGluten = gluten;
+                SelectedDishContainsFish = fish;
                 SelectedDishModified = false;
             }
         }
@@ -188,6 +213,14 @@ namespace WpfUI.ViewModels
             get { return !SelectedDishModified; }
         }
 
+        public string[] AvailableCategories { get; } = MenuCategory.CategoryNames;
+
+        public string CategoryOfSelectedDish
+        { 
+            get; 
+            set; 
+        } = MenuCategory.Category.Starter.ToString();
+
         public DishViewModel(MenuManager m)
         {
             TheMenuManager = m;
@@ -224,28 +257,45 @@ namespace WpfUI.ViewModels
 
         public void SaveChanges()
         {
+            if (string.IsNullOrEmpty(NameOfSelectedDish))
+            {
+                MessageBox.Show("Name must not be empty", "Save Dish");
+                return;
+            }
+
             double price;
             bool ok = ParsePrice(out price);
             if (!ok)
             {
                 return;
             }
+
             int index = TheMenuManager.AllDishes.IndexOf(SelectedDish);
+
             Dish newDish = new Dish(NameOfSelectedDish, DescriptionOfSelectedDish, price);
             newDish.ContainsLactose = SelectedDishContainsLactose;
             newDish.ContainsGluten = SelectedDishContainsGluten;
             newDish.ContainsFish = SelectedDishContainsFish;
 
-            TheMenuManager.AllDishes[index] = newDish;
-            Dishes[index] = newDish;
+            if (index == -1)
+            {
+                // This happens if the combo box is empty.
+                TheMenuManager.AllDishes.Add(newDish);
+                Dishes.Add(newDish);
+            }
+            else
+            {
+                TheMenuManager.AllDishes[index] = newDish;
+                Dishes[index] = newDish;
+            }
+            
             SelectedDish = newDish;
             SelectedDishModified = false;
-            //MessageBox.Show($"Changes were saved to '{newDish.Name}'", "Save Dish");
         }
 
         public void DiscardChanges()
         {
-            if (!SelectedDishModified)
+            if (!SelectedDishModified || SelectedDish == null)
             {
                 return;
             }
@@ -260,6 +310,10 @@ namespace WpfUI.ViewModels
 
         public void DeleteDish()
         {
+            if (TheMenuManager.AllDishes.Count == 0 || SelectedDish == null)
+            {
+                return;
+            }
             if (TheMenuManager.AllDishes.Count <= 1)
             {
                 // TODO List becomes empty. Program crashes.
@@ -276,12 +330,16 @@ namespace WpfUI.ViewModels
                 int index = TheMenuManager.AllDishes.IndexOf(SelectedDish);
                 if (index < 0)
                 {
-                    MessageBox.Show("Error");
+                    MessageBox.Show("Dish does not exist in list");
                     return;
                 }
                 
                 Dish newSelection;
-                if (index == 0)
+                if (TheMenuManager.AllDishes.Count == 1)
+                {
+                    newSelection = null;
+                }
+                else if (index == 0)
                 {
                     newSelection = TheMenuManager.AllDishes[1];
                 }
