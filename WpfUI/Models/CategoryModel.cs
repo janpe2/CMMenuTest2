@@ -11,19 +11,43 @@ namespace WpfUI.Models
 
         public Dish TheDish { get; set; }
 
-        public string Name { get { return TheDish.Name; } }
+        public string Name 
+        { 
+            get { return TheDish.Name; } 
+            set { TheDish.Name = value; }
+        }
 
-        public string Description { get { return TheDish.Description; } }
+        public string Description 
+        { 
+            get { return TheDish.Description; }
+            set { TheDish.Description = value; }
+        }
 
-        public double Price { get { return TheDish.Price; } }
+        public double Price 
+        { 
+            get { return TheDish.Price; }
+            set { TheDish.Price = value; }
+        }
 
-        public bool ContainsLactose { get { return TheDish.ContainsLactose; } }
+        public bool ContainsLactose 
+        { 
+            get { return TheDish.ContainsLactose; }
+            set { TheDish.ContainsLactose = value; }
+        }
 
-        public bool ContainsGluten { get { return TheDish.ContainsGluten; } }
+        public bool ContainsGluten 
+        { 
+            get { return TheDish.ContainsGluten; }
+            set { TheDish.ContainsGluten = value; }
+        }
 
-        public bool ContainsFish { get { return TheDish.ContainsFish; } }
+        public bool ContainsFish 
+        { 
+            get { return TheDish.ContainsFish; }
+            set { TheDish.ContainsFish = value; }
+        }
 
-        public MenuCategory.Category CategoryOfDish { get; set; } = MenuCategory.Category.Starter;
+        public Menu.Category CategoryOfDish { get; set; } = Menu.Category.Starter;
 
         public string CategoryOfDishAsString 
         {
@@ -36,7 +60,7 @@ namespace WpfUI.Models
                 int cat;
                 if (int.TryParse(value, out cat))
                 {
-                    CategoryOfDish = (MenuCategory.Category)cat;
+                    CategoryOfDish = (Menu.Category)cat;
                 }                
             }
         }

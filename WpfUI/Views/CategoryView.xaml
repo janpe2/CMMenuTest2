@@ -19,7 +19,13 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="15"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
@@ -27,37 +33,51 @@
         </Grid.RowDefinitions>
         
         <!-- Row 1 -->
-        
-        <TextBlock Grid.Row="1" Grid.Column="3" Text="Dishes in Category:" Margin="0,0,0,3"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="Menu:" Margin="0,0,0,3"/>
 
         <!-- Row 2 -->
 
-        <GroupBox Header="Category" Grid.Column="1" Grid.Row="2" Padding="3" BorderBrush="#FF546772">
-            <StackPanel Orientation="Vertical">
-                <RadioButton GroupName="CategoryGroup1" Name="CurrentCategoryStarter" Content="Starter" />
-                <RadioButton GroupName="CategoryGroup1" Name="CurrentCategoryMain" Content="Main Course" />
-                <RadioButton GroupName="CategoryGroup1" Name="CurrentCategoryDessert" Content="Dessert"/>
-                <RadioButton GroupName="CategoryGroup1" Name="CurrentCategoryDrink" Content="Drink"/>
-                <RadioButton GroupName="CategoryGroup1" Name="CurrentCategoryUncategorized" Content="Uncategorized"/>
-            </StackPanel>
-        </GroupBox>
+        <ComboBox x:Name="Menus" Grid.Row="2" Grid.Column="1" DisplayMemberPath="Name" Grid.ColumnSpan="4"
+                  SelectedItem="{Binding Path=SelectedMenu, Mode=TwoWay}" />
 
-        <ScrollViewer Grid.Row="2" Grid.Column="3" Grid.RowSpan="1" Grid.ColumnSpan="2">
-            <ListBox x:Name="DishesInCategory" DisplayMemberPath="Name" 
-                     SelectedItem="{Binding Path=SelectedDishCategory, Mode=TwoWay}"/>
-        </ScrollViewer>
+        <!-- Row 3 -->
 
-        <!-- Row 3 is an empty gap -->
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="All Dishes:" Margin="0,0,0,3"/>
+        <TextBlock Grid.Row="3" Grid.Column="3" Text="Categories:" Margin="0,0,0,3"/>
 
         <!-- Row 4 -->
+        
+        <ComboBox x:Name="CategoryNames" Grid.Row="4" Grid.Column="3" DisplayMemberPath="Name"
+                  SelectedItem="{Binding Path=SelectedCategory, Mode=TwoWay}" />
 
-        <Button x:Name="MoveDishToCategory" Grid.Row="4" Grid.Column="3" 
-                Content="Move Selected Dish to Category:" Padding="3" Margin="0,0,0,4"/>
+        <ScrollViewer Grid.Row="4" Grid.Column="1" Grid.RowSpan="6" Grid.ColumnSpan="2">
+            <ListBox x:Name="AllDishes" DisplayMemberPath="Name" 
+                     SelectedItem="{Binding Path=SelectedDishInAllDishes, Mode=TwoWay}" />
+        </ScrollViewer>
 
         <!-- Row 5 -->
+
+        <TextBlock Grid.Row="5" Grid.Column="3" Text="Dishes in Category:" Margin="0,0,0,3"/>
+
+        <!-- Row 7 -->
+
+        <ScrollViewer Grid.Row="7" Grid.Column="3" Grid.RowSpan="4" Grid.ColumnSpan="2">
+            <ListBox x:Name="DishesInCategory" DisplayMemberPath="Name" 
+                     SelectedItem="{Binding Path=SelectedDishInCategory, Mode=OneWay}"/>
+        </ScrollViewer>
+
+        <!-- Row  -->
+
+        <Button Grid.Row="10" Grid.Column="1" x:Name="AddDishToCategory" Content="Add Dish to Category" />
+
+        <!-- Row  -->
+
         
-        <ComboBox x:Name="AllCategories" Grid.Row="5" Grid.Column="3" DisplayMemberPath="Name"
-                  SelectedItem="{Binding Path=SelectedCategoryForMove, Mode=TwoWay}" />
+
+        <!-- Row  -->
+        
+        
 
         <!--
         <ScrollViewer Grid.Row="3" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2">

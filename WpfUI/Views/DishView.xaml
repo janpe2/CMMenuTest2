@@ -24,7 +24,6 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="15"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -62,26 +61,20 @@
                  Text="0,00" Grid.ColumnSpan="4" Margin="3" />
 
         <!-- Row 6 -->
-
-        <TextBlock Text="Category:" Grid.Row="6" Grid.Column="1"/>
-        <ComboBox x:Name="AvailableCategories" Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="4"
-                  SelectedItem="{Binding Path=CategoryOfSelectedDish, Mode=OneWay}" Margin="3" />
-
-        <!-- Row 7 -->
         
-        <GroupBox Header="Dietary Info" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Padding="3" BorderBrush="#FF546772">
+        <GroupBox Header="Dietary Info" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2" Padding="3" BorderBrush="#FF546772">
             <StackPanel Orientation="Vertical">
-                <CheckBox Content="Contains lactose" x:Name="SelectedDishContainsLactose"/>
-                <CheckBox Content="Contains gluten" x:Name="SelectedDishContainsGluten"/>
-                <CheckBox Content="Contains fish" x:Name="SelectedDishContainsFish"/>
+                <CheckBox Content="Contains lactose" x:Name="SelectedDishContainsLactose" Margin="1"/>
+                <CheckBox Content="Contains gluten" x:Name="SelectedDishContainsGluten" Margin="1"/>
+                <CheckBox Content="Contains fish" x:Name="SelectedDishContainsFish" Margin="1"/>
             </StackPanel>
         </GroupBox>
         
-        <!-- Row 8 is an empty gap. -->
+        <!-- Row 7 is an empty gap. -->
 
-        <!-- Row 9 -->
+        <!-- Row 8 -->
 
-        <Button Grid.Row="9" Grid.Column="1" x:Name="SaveChanges" Margin="3"
+        <Button Grid.Row="8" Grid.Column="1" x:Name="SaveChanges" Margin="3"
                 IsEnabled="{Binding SelectedDishModified}" Padding="3">
             <StackPanel Orientation="Horizontal">
                 <Image>
@@ -102,14 +95,14 @@
                 <TextBlock Margin="3,0,0,0">Save Changes</TextBlock>
             </StackPanel>
         </Button>
-        <Button Grid.Row="9" Grid.Column="2" x:Name="DiscardChanges" Content="Discard Changes" Margin="3"
+        <Button Grid.Row="8" Grid.Column="2" x:Name="DiscardChanges" Content="Discard Changes" Margin="3"
                 IsEnabled="{Binding SelectedDishModified}" Padding="3"/>
-        <Button Grid.Row="9" Grid.Column="3" x:Name="DeleteDish" Content="Delete Dish" Margin="3" Padding="3"/>
-        <Button Grid.Row="9" Grid.Column="4" x:Name="AddDish" Content="Add New Dish" Margin="3" Padding="3"/>
+        <Button Grid.Row="8" Grid.Column="3" x:Name="DeleteDish" Content="Delete Dish" Margin="3" Padding="3"/>
+        <Button Grid.Row="8" Grid.Column="4" x:Name="AddDish" Content="Add New Dish" Margin="3" Padding="3"/>
 
-        <!-- Row 10 -->
+        <!-- Row 9 -->
         
-        <TextBlock Grid.Row="10" Grid.Column="1" x:Name="SelectedDishModifiedText" Text="Modified"
+        <TextBlock Grid.Row="9" Grid.Column="1" x:Name="SelectedDishModifiedText" Text="Modified"
                   Foreground="{Binding SelectedDishModifiedColor}" Margin="3" />
 
     </Grid>

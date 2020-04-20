@@ -11,134 +11,104 @@ namespace WpfUI.ViewModels
     {
         public MenuManager TheMenuManager { get; set; }
 
-        public BindableCollection<CategoryModel> DishesInCategory { get; } = new BindableCollection<CategoryModel>();
+        public BindableCollection<Dish> DishesInCategory { get; } = new BindableCollection<Dish>();
 
-        //public string[] CategoryNames { get; } = MenuCategory.CategoryNames;
+        public List<MenuCategory> CategoryNames { get; set; }
 
-        public List<MenuCategory> AllCategories { get; }
+        public List<Menu> Menus { get; }
 
-        public CategoryModel SelectedDishCategory { get; set; }
-
-        public MenuCategory SelectedCategoryForMove { get; set; }
-
-        // TODO remove
-        public string CategoryOfSelectedDish { get; } = "Main";
-
-        private MenuCategory.Category currentCategory = MenuCategory.Category.Starter;
-
-        public bool CurrentCategoryMain 
+        private MenuCategory _selectedCategory;
+        public MenuCategory SelectedCategory 
         { 
-            get { return currentCategory == MenuCategory.Category.Main; }
-            set 
-            { 
-                currentCategory = MenuCategory.Category.Main;
-                updateDishes();
+            get { return _selectedCategory;  } 
+            set
+            {
+                if (value != null)
+                {
+                    _selectedCategory = value;
+                    LoadCategory();
+                }
             }
         }
 
-        public bool CurrentCategoryStarter
+        private Menu _selectedMenu;
+        public Menu SelectedMenu 
         {
-            get { return currentCategory == MenuCategory.Category.Starter; }
-            set 
-            { 
-                currentCategory = MenuCategory.Category.Starter;
-                updateDishes();
+            get { return _selectedMenu; }
+            set
+            {
+                _selectedMenu = value;
+                CategoryNames = SelectedMenu.Categories;
+                NotifyOfPropertyChange(() => CategoryNames);
+                SelectedCategory = SelectedMenu.Categories[0]; // this calls LoadCategory()
+                NotifyOfPropertyChange(() => SelectedCategory);
             }
         }
 
-        public bool CurrentCategoryDessert
-        {
-            get { return currentCategory == MenuCategory.Category.Dessert; }
-            set 
-            { 
-                currentCategory = MenuCategory.Category.Dessert;
-                updateDishes();
-            }
-        }
+        public List<Dish> AllDishes { get; set; }
 
-        public bool CurrentCategoryDrink
-        {
-            get { return currentCategory == MenuCategory.Category.Drink; }
-            set 
-            { 
-                currentCategory = MenuCategory.Category.Drink;
-                updateDishes();
-            }
-        }
+        public Dish SelectedDishInCategory { get; set; }
 
-        public bool CurrentCategoryUncategorized
-        {
-            get { return currentCategory == MenuCategory.Category.Uncategorized; }
-            set 
-            { 
-                currentCategory = MenuCategory.Category.Uncategorized;
-                updateDishes();
-            }
-        }
+        public Dish SelectedDishInAllDishes { get; set; }
 
-        private void updateDishes()
+        private void LoadCategory()
         {
-            MenuCategory cat = TheMenuManager.AllCategories[(int)currentCategory];
             DishesInCategory.Clear();
-            foreach (var dish in cat.Dishes)
-            {
-                DishesInCategory.Add(new CategoryModel(dish));
-            }
+            DishesInCategory.AddRange(SelectedCategory.Dishes);
 
-            if (cat.Dishes.Count == 0)
+            if (DishesInCategory.Count == 0)
             {
-                SelectedDishCategory = null;
+                SelectedDishInCategory = null;
             }
             else
             {
-                SelectedDishCategory = DishesInCategory[0];
+                SelectedDishInCategory = DishesInCategory[0];
             }
 
-            NotifyOfPropertyChange(() => SelectedDishCategory);
             NotifyOfPropertyChange(() => DishesInCategory);
-            NotifyOfPropertyChange(() => CurrentCategoryStarter);
-            NotifyOfPropertyChange(() => CurrentCategoryMain);
-            NotifyOfPropertyChange(() => CurrentCategoryDessert);
-            NotifyOfPropertyChange(() => CurrentCategoryDrink);
-            NotifyOfPropertyChange(() => CurrentCategoryUncategorized);
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="manager">menu manager</param>
         public CategoryViewModel(MenuManager manager)
         {
             TheMenuManager = manager;
-            AllCategories = manager.AllCategories;
-            SelectedCategoryForMove = manager.AllCategories[0];
-            MenuCategory cat = TheMenuManager.AllCategories[(int)MenuCategory.Category.Starter];
-            foreach (var dish in cat.Dishes)
-            {
-                DishesInCategory.Add(new CategoryModel(dish));
-            }
+            SelectedMenu = manager.AllMenus[0];
+            CategoryNames = SelectedMenu.Categories;
+            Menus = manager.AllMenus;
+            SelectedCategory = SelectedMenu.Categories[0];
+            AllDishes = manager.AllDishes;
         }
 
-        public void MoveDishToCategory()
+        public void AddDishToCategory()
         {
             //System.Windows.MessageBox.Show(
             //    $"Move {(SelectedDishCategory == null ? "null" : SelectedDishCategory.Name)}: {currentCategory} -> {SelectedCategoryForMove.Name}" +
             //    ", " + DishesInCategory.Contains(SelectedDishCategory));
-
-            if (SelectedDishCategory == null || !DishesInCategory.Contains(SelectedDishCategory))
+            
+            if (SelectedCategory == null)
+            {
+                System.Windows.MessageBox.Show("No category has been selected");
+                return;
+            }
+            if (SelectedDishInAllDishes == null)
             {
                 System.Windows.MessageBox.Show("No dish has been selected");
                 return;
             }
 
-            MenuCategory sourceCategory = TheMenuManager.AllCategories[(int)currentCategory];
-            Dish dish = SelectedDishCategory.TheDish;
-            if (SelectedCategoryForMove.Dishes.Contains(dish))
+            Dish dish = SelectedDishInAllDishes;
+            if (SelectedCategory.Dishes.Contains(dish))
             {
-                System.Windows.MessageBox.Show($"The dish {dish.Name} is already in category {SelectedCategoryForMove.Id}");
+                System.Windows.MessageBox.Show($"The dish {dish.Name} is already in category {SelectedCategory.Id}");
                 return;
             }
 
-            sourceCategory.Dishes.Remove(dish);
-            DishesInCategory.Remove(SelectedDishCategory);
-            SelectedCategoryForMove.Dishes.Add(dish);
-
+            DishesInCategory.Add(dish);
+            SelectedCategory.Dishes.Add(dish);
+            SelectedDishInCategory = dish;
             NotifyOfPropertyChange(() => DishesInCategory);
         }
     }

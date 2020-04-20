@@ -34,7 +34,6 @@ namespace WpfUI.ViewModels
 
                 string name, descr, price;
                 bool lactose, gluten, fish;
-                MenuCategory.Category cat;
 
                 if (_selectedDish == null)
                 {
@@ -44,7 +43,6 @@ namespace WpfUI.ViewModels
                     lactose = false;
                     gluten = false;
                     fish = false;
-                    cat = MenuCategory.Category.Starter;
                 }
                 else
                 {
@@ -54,14 +52,12 @@ namespace WpfUI.ViewModels
                     lactose = _selectedDish.ContainsLactose;
                     gluten = _selectedDish.ContainsGluten;
                     fish = _selectedDish.ContainsFish;
-                    cat = TheMenuManager.GetCategoryOfDish(_selectedDish);
                 }
 
                 NotifyOfPropertyChange(() => SelectedDish);
                 NameOfSelectedDish = name;
                 PriceOfSelectedDish = price;
                 DescriptionOfSelectedDish = descr;
-                CategoryOfSelectedDish = cat.ToString();
                 SelectedDishContainsLactose = lactose;
                 SelectedDishContainsGluten = gluten;
                 SelectedDishContainsFish = fish;
@@ -213,14 +209,6 @@ namespace WpfUI.ViewModels
             get { return !SelectedDishModified; }
         }
 
-        public string[] AvailableCategories { get; } = MenuCategory.CategoryNames;
-
-        public string CategoryOfSelectedDish
-        { 
-            get; 
-            set; 
-        } = MenuCategory.Category.Starter.ToString();
-
         public DishViewModel(MenuManager m)
         {
             TheMenuManager = m;
@@ -271,25 +259,25 @@ namespace WpfUI.ViewModels
             }
 
             int index = TheMenuManager.AllDishes.IndexOf(SelectedDish);
+            bool isRenamed = _selectedDish.Name != NameOfSelectedDish;
 
-            Dish newDish = new Dish(NameOfSelectedDish, DescriptionOfSelectedDish, price);
-            newDish.ContainsLactose = SelectedDishContainsLactose;
-            newDish.ContainsGluten = SelectedDishContainsGluten;
-            newDish.ContainsFish = SelectedDishContainsFish;
+            _selectedDish.Name = NameOfSelectedDish;
+            _selectedDish.Description = DescriptionOfSelectedDish;
+            _selectedDish.Price = price;
+            _selectedDish.ContainsLactose = SelectedDishContainsLactose;
+            _selectedDish.ContainsGluten = SelectedDishContainsGluten;
+            _selectedDish.ContainsFish = SelectedDishContainsFish;
 
-            if (index == -1)
+            if (isRenamed)
             {
-                // This happens if the combo box is empty.
-                TheMenuManager.AllDishes.Add(newDish);
-                Dishes.Add(newDish);
+                // Make sure the new name appears in the combo box.
+                // TODO This does not work. The selected item won't show the new name. Maybe we
+                // should create a new Dish object. but then we get problems elsewhere because
+                // == comparisons of objects would return false.
+                NotifyOfPropertyChange(() => Dishes);
+                NotifyOfPropertyChange(() => SelectedDish);
+                //Dishes.Refresh();
             }
-            else
-            {
-                TheMenuManager.AllDishes[index] = newDish;
-                Dishes[index] = newDish;
-            }
-            
-            SelectedDish = newDish;
             SelectedDishModified = false;
         }
 
@@ -313,12 +301,6 @@ namespace WpfUI.ViewModels
             if (TheMenuManager.AllDishes.Count == 0 || SelectedDish == null)
             {
                 return;
-            }
-            if (TheMenuManager.AllDishes.Count <= 1)
-            {
-                // TODO List becomes empty. Program crashes.
-                //MessageBox.Show("You can't delete the last dish.");
-                //return;
             }
 
             MessageBoxResult messageBoxResult = MessageBox.Show(

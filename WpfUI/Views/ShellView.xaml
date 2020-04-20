@@ -25,13 +25,11 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <Button x:Name="ShowDishes" Grid.Row="1" Grid.Column="1" Margin="5" Padding="3">Edit Dishes</Button>
+        <Button x:Name="ShowDishes" Grid.Row="1" Grid.Column="1" Margin="5" Padding="5">Edit Dishes</Button>
 
-        <Button x:Name="ShowCategories" Grid.Row="2" Grid.Column="1" Margin="5" Padding="3">Edit Categories</Button>
+        <Button x:Name="ShowMenus" Grid.Row="2" Grid.Column="1" Margin="5" Padding="5">Edit Menus</Button>
 
-        <Button x:Name="ShowMenus" Grid.Row="3" Grid.Column="1" Margin="5" Padding="3">Edit Menus</Button>
-
-        <Button x:Name="ExitApplication" Grid.Row="4" Grid.Column="1" Margin="5" Padding="3">Exit</Button>
+        <Button x:Name="ExitApplication" Grid.Row="3" Grid.Column="1" Margin="5" Padding="5">Exit</Button>
 
         <ContentControl Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" 
                Grid.RowSpan="5" x:Name="ActiveItem"/>
