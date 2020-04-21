@@ -18,9 +18,9 @@ namespace WpfUI.MenuLibrary
             Uncategorized
         }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string Description { get; }
+        public string Description { get; set; }
 
         public List<MenuCategory> Categories { get; } = new List<MenuCategory>();
 

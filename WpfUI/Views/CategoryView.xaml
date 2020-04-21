@@ -10,7 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="25"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="20"/>
@@ -28,86 +28,86 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Row 1 -->
 
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="Menu:" Margin="0,0,0,3"/>
+        <TextBlock Grid.Row="1" Grid.Column="3" Text="Menu:" Margin="0,0,0,3" FontWeight="Bold"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="All Dishes:" Margin="0,0,0,3" FontWeight="Bold"/>
 
         <!-- Row 2 -->
 
-        <ComboBox x:Name="Menus" Grid.Row="2" Grid.Column="1" DisplayMemberPath="Name" Grid.ColumnSpan="4"
+        <ComboBox x:Name="Menus" Grid.Row="2" Grid.Column="3" DisplayMemberPath="Name" Grid.ColumnSpan="2"
                   SelectedItem="{Binding Path=SelectedMenu, Mode=TwoWay}" />
-
-        <!-- Row 3 -->
-
-        <TextBlock Grid.Row="3" Grid.Column="1" Text="All Dishes:" Margin="0,0,0,3"/>
-        <TextBlock Grid.Row="3" Grid.Column="3" Text="Categories:" Margin="0,0,0,3"/>
-
-        <!-- Row 4 -->
-        
-        <ComboBox x:Name="CategoryNames" Grid.Row="4" Grid.Column="3" DisplayMemberPath="Name"
-                  SelectedItem="{Binding Path=SelectedCategory, Mode=TwoWay}" />
-
-        <ScrollViewer Grid.Row="4" Grid.Column="1" Grid.RowSpan="6" Grid.ColumnSpan="2">
+        <ScrollViewer Grid.Row="2" Grid.Column="1" Grid.RowSpan="6" Grid.ColumnSpan="1">
             <ListBox x:Name="AllDishes" DisplayMemberPath="Name" 
                      SelectedItem="{Binding Path=SelectedDishInAllDishes, Mode=TwoWay}" />
         </ScrollViewer>
 
+        <!-- Row 3 -->
+
+        <TextBlock Grid.Row="3" Grid.Column="3" Text="Menu Description:" Margin="0,0,0,3" VerticalAlignment="Bottom"/>
+
+        <!-- Row 4 -->
+
+        <TextBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2"
+                 Text="{Binding Path=SelectedMenuDescription, Mode=TwoWay}" />
+
         <!-- Row 5 -->
 
-        <TextBlock Grid.Row="5" Grid.Column="3" Text="Dishes in Category:" Margin="0,0,0,3"/>
+        <TextBlock Grid.Row="5" Grid.Column="3" Text="Category:" Margin="0,0,0,3" VerticalAlignment="Bottom"/>
+
+        <!-- Row 6 -->
+
+        <ComboBox x:Name="CategoryNames" Grid.Row="6" Grid.Column="3" DisplayMemberPath="Name"
+                  SelectedItem="{Binding Path=SelectedCategory, Mode=TwoWay}" Grid.ColumnSpan="2"
+                  />
 
         <!-- Row 7 -->
 
-        <ScrollViewer Grid.Row="7" Grid.Column="3" Grid.RowSpan="4" Grid.ColumnSpan="2">
+        <TextBlock Grid.Row="7" Grid.Column="3" Text="Dishes:" Margin="0,0,0,3" VerticalAlignment="Bottom"/>
+
+        <!-- Row 8 -->
+
+        <ScrollViewer Grid.Row="8" Grid.Column="3" Grid.RowSpan="6" Grid.ColumnSpan="2">
             <ListBox x:Name="DishesInCategory" DisplayMemberPath="Name" 
-                     SelectedItem="{Binding Path=SelectedDishInCategory, Mode=OneWay}"/>
+                     SelectedItem="{Binding Path=SelectedDishInCategory, Mode=TwoWay}"/>
         </ScrollViewer>
 
-        <!-- Row  -->
+        <!-- Row 9 -->
 
-        <Button Grid.Row="10" Grid.Column="1" x:Name="AddDishToCategory" Content="Add Dish to Category" />
+        <Button Grid.Row="9" Grid.Column="1" x:Name="AddDishToCategory" Padding="3" 
+                Margin="0,8,0,0" ToolTip="Add dish to menu in selected category">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/plus_green.png" />
+                    <TextBlock Margin="3,0,0,0">Add Dish to Menu</TextBlock>
+            </StackPanel>
+        </Button>
+    
+        <!-- Row 10 -->
 
-        <!-- Row  -->
+        <Button Grid.Row="10" Grid.Column="1" x:Name="RemoveDishFromCategory" Padding="3" 
+                Margin="0,6,0,0" ToolTip="Remove dish from menu in selected category">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/ex_red.png" />
+                <TextBlock Margin="3,0,0,0">Remove Dish from Menu</TextBlock>
+            </StackPanel>
+        </Button>
 
-        
+        <!-- Row 11 -->
 
-        <!-- Row  -->
-        
-        
+        <GroupBox Header="Menu Tools" Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="1" 
+                  BorderBrush="#FF546772" Margin="0,14,0,0" Padding="2">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="AddMenu" Content="New" Padding="2" Margin="5" ToolTip="Add a new menu"/>
+                <Button x:Name="DeleteMenu" Content="Delete" Padding="2" Margin="5" ToolTip="Delete selected menu" />
+                <Button x:Name="RenameMenu" Content="Rename" Padding="2" Margin="5" ToolTip="Rename selected menu" />
+            </StackPanel>
+        </GroupBox>
 
-        <!--
-        <ScrollViewer Grid.Row="3" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2">
-            <DataGrid x:Name="DishesInCategory" AlternatingRowBackground="#FFF1FCFF" CanUserAddRows="False" AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    
-                    <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" IsReadOnly="True" FontWeight="Bold"/>
-                    
-                    <DataGridTemplateColumn Header="Category">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=CategoryOfDishAsString, Mode=TwoWay}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                Here ComboBox items are strings, so we don't need a ComboBox.ItemTemplate
-                                <ComboBox ItemsSource="{Binding Path=CategoryNames}" SelectedItem="{Binding Path=CategoryNames[0]}">
-                                </ComboBox>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTextColumn Header="Description" Binding="{Binding Path=Description, Mode=OneWay}" IsReadOnly="True"/>
-                    <DataGridCheckBoxColumn Header="Lactose" Binding="{Binding Path=ContainsLactose, Mode=OneWay}"/>
-                    
-                </DataGrid.Columns>
-            </DataGrid>
-        </ScrollViewer>
-        -->
 
     </Grid>
 </UserControl>

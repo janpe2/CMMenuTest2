@@ -10,6 +10,7 @@
     <None Remove="Views\Images\check_green.png" />
     <None Remove="Views\Images\exclam_red.png" />
     <None Remove="Views\Images\ex_red.png" />
+    <None Remove="Views\Images\plus_green.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,7 @@
     <Resource Include="Views\Images\check_green.png" />
     <Resource Include="Views\Images\exclam_red.png" />
     <Resource Include="Views\Images\ex_red.png" />
+    <Resource Include="Views\Images\plus_green.png" />
   </ItemGroup>
 
 </Project>

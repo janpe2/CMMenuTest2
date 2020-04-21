@@ -67,5 +67,12 @@ namespace WpfUI.MenuLibrary
             return dish;
         }
 
+        public List<Dish> GetAllDishesSortedAlphabetically()
+        {
+            List<Dish> list = new List<Dish>(AllDishes);
+            list.Sort((a, b) => a.Name.CompareTo(b.Name));
+            return list;
+        }
+
     }
 }
