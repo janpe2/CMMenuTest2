@@ -8,7 +8,9 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner" 
         ResizeMode="NoResize"
-        Title="{Binding DialogTitle}" Height="Auto" Width="Auto" d:DesignWidth="218.653" d:DesignHeight="135.32" >
+        Title="{Binding DialogTitle}" Height="Auto" Width="Auto" 
+        FocusManager.FocusedElement="{Binding ElementName=InputText}"
+        d:DesignWidth="218.653" d:DesignHeight="135.32" SizeToContent="WidthAndHeight" >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="15"/>

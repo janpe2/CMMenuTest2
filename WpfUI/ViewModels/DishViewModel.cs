@@ -270,13 +270,12 @@ namespace WpfUI.ViewModels
 
             if (isRenamed)
             {
-                // Make sure the new name appears in the combo box.
-                // TODO This does not work. The selected item won't show the new name. Maybe we
-                // should create a new Dish object. but then we get problems elsewhere because
-                // == comparisons of objects would return false.
+                // Reload the list to force items update in ComboBox
+                Dishes.Clear();
+                Dishes.AddRange(TheMenuManager.AllDishes);
+
                 NotifyOfPropertyChange(() => Dishes);
                 NotifyOfPropertyChange(() => SelectedDish);
-                //Dishes.Refresh();
             }
             SelectedDishModified = false;
         }

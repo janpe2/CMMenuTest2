@@ -28,7 +28,6 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
@@ -42,7 +41,8 @@
 
         <ComboBox x:Name="Menus" Grid.Row="2" Grid.Column="3" DisplayMemberPath="Name" Grid.ColumnSpan="2"
                   SelectedItem="{Binding Path=SelectedMenu, Mode=TwoWay}" />
-        <ScrollViewer Grid.Row="2" Grid.Column="1" Grid.RowSpan="6" Grid.ColumnSpan="1">
+
+        <ScrollViewer Grid.Row="2" Grid.Column="1" Grid.RowSpan="6" Grid.ColumnSpan="1" Height="118">
             <ListBox x:Name="AllDishes" DisplayMemberPath="Name" 
                      SelectedItem="{Binding Path=SelectedDishInAllDishes, Mode=TwoWay}" />
         </ScrollViewer>
@@ -63,8 +63,7 @@
         <!-- Row 6 -->
 
         <ComboBox x:Name="CategoryNames" Grid.Row="6" Grid.Column="3" DisplayMemberPath="Name"
-                  SelectedItem="{Binding Path=SelectedCategory, Mode=TwoWay}" Grid.ColumnSpan="2"
-                  />
+                  SelectedItem="{Binding Path=SelectedCategory, Mode=TwoWay}" Grid.ColumnSpan="2" />
 
         <!-- Row 7 -->
 
@@ -72,7 +71,7 @@
 
         <!-- Row 8 -->
 
-        <ScrollViewer Grid.Row="8" Grid.Column="3" Grid.RowSpan="6" Grid.ColumnSpan="2">
+        <ScrollViewer Grid.Row="8" Grid.Column="3" Grid.RowSpan="5" Grid.ColumnSpan="2">
             <ListBox x:Name="DishesInCategory" DisplayMemberPath="Name" 
                      SelectedItem="{Binding Path=SelectedDishInCategory, Mode=TwoWay}"/>
         </ScrollViewer>
@@ -99,7 +98,7 @@
 
         <!-- Row 11 -->
 
-        <GroupBox Header="Menu Tools" Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="1" 
+        <GroupBox Header="Menu Tools" Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="1" Grid.RowSpan="1"
                   BorderBrush="#FF546772" Margin="0,14,0,0" Padding="2">
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="AddMenu" Content="New" Padding="2" Margin="5" ToolTip="Add a new menu"/>

@@ -21,7 +21,10 @@ namespace WpfUI.ViewModels
         private MenuCategory _selectedCategory;
         public MenuCategory SelectedCategory 
         { 
-            get { return _selectedCategory;  } 
+            get 
+            { 
+                return _selectedCategory;  
+            } 
             set
             {
                 if (value != null)
@@ -57,9 +60,9 @@ namespace WpfUI.ViewModels
                 if (value != null)
                 {
                     _selectedMenu = value;
-                    CategoryNames = value.Categories;
-                    SelectedMenuDescription = value.Description;
+                    //CategoryNames = value.Categories;
                     SelectedCategory = value.Categories[0]; // this calls LoadCategory()
+                    SelectedMenuDescription = value.Description;
                     NotifyOfPropertyChange(() => CategoryNames);
                     NotifyOfPropertyChange(() => SelectedCategory);
                     NotifyOfPropertyChange(() => SelectedMenu);
@@ -198,11 +201,10 @@ namespace WpfUI.ViewModels
                 }
 
                 TheMenuManager.AllMenus.RemoveAt(index);
-                SelectedMenu = newSelection;
-
                 Menus.Clear();
                 Menus.AddRange(TheMenuManager.AllMenus);
                 NotifyOfPropertyChange(() => Menus);
+                SelectedMenu = newSelection;
             }
         }
 
@@ -236,7 +238,14 @@ namespace WpfUI.ViewModels
             }
 
             SelectedMenu.Name = newName;
+
+            // Reload the list to force items update in ComboBox
+            Menus.Clear();
+            Menus.AddRange(TheMenuManager.AllMenus);
+
+            NotifyOfPropertyChange(() => Menus);
             NotifyOfPropertyChange(() => SelectedMenu);
+            
         }
 
 
