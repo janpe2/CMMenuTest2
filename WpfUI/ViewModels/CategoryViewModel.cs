@@ -243,9 +243,9 @@ namespace WpfUI.ViewModels
             Menus.Clear();
             Menus.AddRange(TheMenuManager.AllMenus);
 
+            // TODO Selected item disappears in combo box
             NotifyOfPropertyChange(() => Menus);
             NotifyOfPropertyChange(() => SelectedMenu);
-            
         }
 
 

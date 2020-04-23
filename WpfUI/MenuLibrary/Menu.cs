@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WpfUI.MenuLibrary
 {
-    public class Menu
+    public class Menu // : IEquatable<Menu>
     {
         /// <summary>
         /// Category for dishes in a menu.
@@ -42,7 +42,33 @@ namespace WpfUI.MenuLibrary
             Categories[(int)category].Dishes.Add(dish);
         }
 
+        /*
+        public override bool Equals(object obj)
+        {
+            var other = obj as Menu;
+            return Object.ReferenceEquals(other, this);
+        }
 
-        
+        public bool Equals(Menu m)
+        {
+            return Object.ReferenceEquals(m, this);
+        }
+
+        public static bool operator ==(Menu a, Menu b)
+        {
+            return Object.ReferenceEquals(a, b);
+        }
+
+        public static bool operator !=(Menu a, Menu b)
+        {
+            return !Object.ReferenceEquals(a, b);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        */
+
     }
 }
