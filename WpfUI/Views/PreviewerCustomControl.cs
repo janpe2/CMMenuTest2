@@ -56,8 +56,18 @@ namespace WpfUI.Views
         {
             base.OnRender(dc);
 
-            double w = Width, h = Height;
-            dc.DrawRectangle(Brushes.Azure, new Pen(Brushes.Black, 2.0), new Rect(0, 0, w, h));
+            double width = ActualWidth, height = ActualHeight;
+            const double widthA4 = 595, heightA4 = 842;
+            double scaleX = width / widthA4;
+            double scaleY = height / heightA4;
+            double scale = Math.Min(scaleX, scaleY);
+            double scaledWidth = scale * widthA4;
+            double scaledHeight = scale * heightA4;
+            double x = (width - scaledWidth) / 2;
+            double y = (height - scaledHeight) / 2;
+
+            dc.DrawRectangle(Brushes.Azure, new Pen(Brushes.Black, 2.0), 
+                new Rect(x, y, scaledWidth, scaledHeight));
 
             var text = new FormattedText("Menu",
                     cultureInfo,
@@ -65,7 +75,9 @@ namespace WpfUI.Views
                     new Typeface(new FontFamily("Times New Roman"), FontStyles.Italic, FontWeights.Bold, FontStretches.Normal), 
                     25.0, Brushes.Blue, 1.0);
 
-            dc.DrawText(text, new Point(20.0, 45.0));
+            dc.DrawText(text, new Point(x + 20.0, y + 45.0));
+
+            //System.Diagnostics.Trace.WriteLine(width + " " + height);
         }
         
     }

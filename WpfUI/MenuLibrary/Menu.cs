@@ -24,11 +24,14 @@ namespace WpfUI.MenuLibrary
 
         public List<MenuCategory> Categories { get; } = new List<MenuCategory>();
 
-        public Menu(string name, string descr)
+        public Menu(string name, string descr) : this()
         {
             Name = name;
             Description = descr;
+        }
 
+        public Menu()
+        {
             Categories.Add(new MenuCategory(Menu.Category.Starter));
             Categories.Add(new MenuCategory(Menu.Category.MainCourse));
             Categories.Add(new MenuCategory(Menu.Category.Dessert));

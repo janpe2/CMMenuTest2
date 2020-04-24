@@ -39,5 +39,20 @@ namespace WpfUI.MenuLibrary
             ContainsGluten = gluten;
             ContainsFish = fish;
         }
+
+        public Dish(int id, string name, string descr, double price, bool lactose, bool gluten, bool fish)
+        {
+            Name = name;
+            Price = price;
+            Description = descr;
+            ContainsLactose = lactose;
+            ContainsGluten = gluten;
+            ContainsFish = fish;
+        }
+
+        public Dish()
+        {
+
+        }
     }
 }
