@@ -1,8 +1,8 @@
 ﻿CREATE TABLE [dbo].[Dish]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [Name] NCHAR(50) NULL, 
-    [Description] NCHAR(50) NULL, 
+    [Name] NVARCHAR(50) NULL, 
+    [Description] NVARCHAR(50) NULL, 
     [Price] FLOAT NULL, 
     [ContainsLactose] BIT NULL, 
     [ContainsGluten] BIT NULL, 

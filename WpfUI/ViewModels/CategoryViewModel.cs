@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using WpfUI.MenuLibrary;
+using WpfUI.MenuLibrary.DataAccess;
 using WpfUI.Models;
 
 namespace WpfUI.ViewModels
 {
     public class CategoryViewModel : Screen
     {
-        public MenuManager TheMenuManager { get; set; }
+        //public MenuManager TheMenuManager { get; set; }
 
         public BindableCollection<Dish> DishesInCategory { get; } = new BindableCollection<Dish>();
 
@@ -106,14 +107,16 @@ namespace WpfUI.ViewModels
         /// Constructor.
         /// </summary>
         /// <param name="manager">menu manager</param>
-        public CategoryViewModel(MenuManager manager)
+        public CategoryViewModel(MenuManager managerxx)
         {
-            TheMenuManager = manager;
-            SelectedMenu = manager.AllMenus[0];
+            //TheMenuManager = manager;
+            DataAccess da = new DataAccess();
+
             CategoryNames = SelectedMenu.Categories;
-            Menus.AddRange(manager.AllMenus);
+            Menus.AddRange(da.GetAllMenus());
+            SelectedMenu = Menus[0];
             SelectedCategory = SelectedMenu.Categories[0];
-            AllDishes = manager.GetAllDishesSortedAlphabetically();
+            AllDishes = da.GetAllDishes();
         }
 
         public void AddDishToCategory()
@@ -132,7 +135,7 @@ namespace WpfUI.ViewModels
             Dish dish = SelectedDishInAllDishes;
             if (SelectedCategory.Dishes.Contains(dish))
             {
-                MessageBox.Show($"The dish {dish.Name} is already in category {SelectedCategory.Id}");
+                MessageBox.Show($"The dish {dish.Name} is already in category");
                 return;
             }
 
@@ -165,7 +168,7 @@ namespace WpfUI.ViewModels
             }
 
             Menu menu = new Menu(name, "");
-            TheMenuManager.AllMenus.Add(menu);
+            new DataAccess().AddMenu(menu);
             Menus.Add(menu);
             NotifyOfPropertyChange(() => Menus);
             SelectedMenu = menu;
@@ -179,30 +182,32 @@ namespace WpfUI.ViewModels
 
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                int index = TheMenuManager.AllMenus.IndexOf(SelectedMenu);
+                int index = Menus.IndexOf(SelectedMenu);
                 Menu newSelection;
 
                 if (index == -1)
                 {
                     return;
                 }
-                else if (TheMenuManager.AllMenus.Count == 1)
+                else if (Menus.Count == 1)
                 {
                     // TODO
                     return; // newSelection = null;
                 }
                 else if (index == 0)
                 {
-                    newSelection = TheMenuManager.AllMenus[1];
+                    newSelection = Menus[1];
                 }
                 else
                 {
-                    newSelection = TheMenuManager.AllMenus[index - 1];
+                    newSelection = Menus[index - 1];
                 }
 
-                TheMenuManager.AllMenus.RemoveAt(index);
+                DataAccess da = new DataAccess();
+                da.DeleteMenu(SelectedMenu);
+                //TheMenuManager.AllMenus.RemoveAt(index);
                 Menus.Clear();
-                Menus.AddRange(TheMenuManager.AllMenus);
+                Menus.AddRange(da.GetAllMenus());
                 NotifyOfPropertyChange(() => Menus);
                 SelectedMenu = newSelection;
             }
@@ -241,7 +246,7 @@ namespace WpfUI.ViewModels
 
             // Reload the list to force items update in ComboBox
             Menus.Clear();
-            Menus.AddRange(TheMenuManager.AllMenus);
+            Menus.AddRange(new DataAccess().GetAllMenus());
 
             // TODO Selected item disappears in combo box
             NotifyOfPropertyChange(() => Menus);

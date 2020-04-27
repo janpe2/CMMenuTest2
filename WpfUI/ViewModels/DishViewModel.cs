@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using WpfUI.MenuLibrary;
+using WpfUI.MenuLibrary.DataAccess;
 using WpfUI.Models;
 
 namespace WpfUI.ViewModels
 {
     public class DishViewModel : Screen
     {
-        public MenuManager TheMenuManager { get; set; }
+        //public MenuManager TheMenuManager { get; set; }
 
         private BindableCollection<Dish> _dishes = new BindableCollection<Dish>();
         public BindableCollection<Dish> Dishes 
@@ -34,6 +35,7 @@ namespace WpfUI.ViewModels
 
                 string name, descr, price;
                 bool lactose, gluten, fish;
+                int id;
 
                 if (_selectedDish == null)
                 {
@@ -43,6 +45,7 @@ namespace WpfUI.ViewModels
                     lactose = false;
                     gluten = false;
                     fish = false;
+                    id = -1;
                 }
                 else
                 {
@@ -52,11 +55,13 @@ namespace WpfUI.ViewModels
                     lactose = _selectedDish.ContainsLactose;
                     gluten = _selectedDish.ContainsGluten;
                     fish = _selectedDish.ContainsFish;
+                    id = _selectedDish.Id;
                 }
 
                 NotifyOfPropertyChange(() => SelectedDish);
                 NameOfSelectedDish = name;
                 PriceOfSelectedDish = price;
+                IdOfSelectedDish = id;
                 DescriptionOfSelectedDish = descr;
                 SelectedDishContainsLactose = lactose;
                 SelectedDishContainsGluten = gluten;
@@ -92,6 +97,17 @@ namespace WpfUI.ViewModels
                 _priceOfSelectedDish = value;
                 SelectedDishModified = true;
                 NotifyOfPropertyChange(() => PriceOfSelectedDish);
+            }
+        }
+
+        private int _idOfSelectedDish;
+        public int IdOfSelectedDish 
+        { 
+            get { return _idOfSelectedDish; }
+            set
+            {
+                _idOfSelectedDish = value;
+                NotifyOfPropertyChange(() => IdOfSelectedDish);
             }
         }
 
@@ -211,11 +227,15 @@ namespace WpfUI.ViewModels
 
         public DishViewModel(MenuManager m)
         {
-            TheMenuManager = m;
-            _dishes.AddRange(m.AllDishes);
+            //TheMenuManager = m;
+
+            DataAccess da = new DataAccess();
+            List<Dish> allDishes = da.GetAllDishes();
+            _dishes.AddRange(TrimNames(allDishes));
+
             if (m.AllDishes.Count > 0)
             {
-                SelectedDish = m.AllDishes[0];
+                SelectedDish = _dishes[0];
             }
         }
 
@@ -229,6 +249,28 @@ namespace WpfUI.ViewModels
             return ok;
         }
 
+        private bool IsDishNameInUse(string name, Dish currentDish)
+        {
+            foreach (var d in Dishes)
+            {
+                if (d.Name == name && d != currentDish)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private List<Dish> TrimNames(List<Dish> list)
+        {
+            foreach (var d in list)
+            {
+                d.Name = d.Name.Trim();
+                d.Description = d.Description.Trim();
+            }
+            return list;
+        }
+
         public void AddDish()
         {
             if (!AskToSaveChanges())
@@ -236,9 +278,32 @@ namespace WpfUI.ViewModels
                 return;
             }
 
-            Dish dish = new Dish("New Dish", "", 0.00);
+            // Create a unique name by appending an integer
+            string name;
+            int number = Dishes.Count + 1;
+            while (true)
+            {
+                name = $"New dish {number}";
+                if (IsDishNameInUse(name, null))
+                {
+                    number++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            string descr = "";
+            double price = 0.00;
+            Dish dish = new Dish(name, descr, price);
+            dish.Id = GetMaxId() + 1;
+
+            DataAccess da = new DataAccess();
+            da.InsertDish(dish);
+
             Dishes.Add(dish);
-            TheMenuManager.AllDishes.Add(dish);
+            //TheMenuManager.AllDishes.Add(dish);
             SelectedDish = dish;
             SelectedDishModified = false;
         }
@@ -258,8 +323,17 @@ namespace WpfUI.ViewModels
                 return;
             }
 
-            int index = TheMenuManager.AllDishes.IndexOf(SelectedDish);
-            bool isRenamed = _selectedDish.Name != NameOfSelectedDish;
+            string oldName = _selectedDish.Name, newName = NameOfSelectedDish;
+
+            // TODO This does not find duplicate names!
+            if (IsDishNameInUse(newName, _selectedDish))
+            {
+                MessageBox.Show($"Dish named {newName} already exists. Please write a different name.", "Save Dish");
+                return;
+            }
+
+            int index = Dishes.IndexOf(SelectedDish);
+            bool isRenamed = oldName != newName;
 
             _selectedDish.Name = NameOfSelectedDish;
             _selectedDish.Description = DescriptionOfSelectedDish;
@@ -268,11 +342,14 @@ namespace WpfUI.ViewModels
             _selectedDish.ContainsGluten = SelectedDishContainsGluten;
             _selectedDish.ContainsFish = SelectedDishContainsFish;
 
+            DataAccess da = new DataAccess();
+            da.ModifyDish(_selectedDish);
+
             if (isRenamed)
             {
                 // Reload the list to force items update in ComboBox
                 Dishes.Clear();
-                Dishes.AddRange(TheMenuManager.AllDishes);
+                Dishes.AddRange(TrimNames(new DataAccess().GetAllDishes()));
 
                 NotifyOfPropertyChange(() => Dishes);
                 NotifyOfPropertyChange(() => SelectedDish);
@@ -297,7 +374,7 @@ namespace WpfUI.ViewModels
 
         public void DeleteDish()
         {
-            if (TheMenuManager.AllDishes.Count == 0 || SelectedDish == null)
+            if (Dishes.Count == 0 || SelectedDish == null)
             {
                 return;
             }
@@ -308,7 +385,7 @@ namespace WpfUI.ViewModels
 
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                int index = TheMenuManager.AllDishes.IndexOf(SelectedDish);
+                int index = Dishes.IndexOf(SelectedDish);
                 if (index < 0)
                 {
                     MessageBox.Show("Dish does not exist in list");
@@ -316,20 +393,25 @@ namespace WpfUI.ViewModels
                 }
                 
                 Dish newSelection;
-                if (TheMenuManager.AllDishes.Count == 1)
+                if (Dishes.Count == 1)
                 {
                     newSelection = null;
                 }
                 else if (index == 0)
                 {
-                    newSelection = TheMenuManager.AllDishes[1];
+                    newSelection = Dishes[1];
                 }
                 else
                 {
-                    newSelection = TheMenuManager.AllDishes[index - 1];
+                    newSelection = Dishes[index - 1];
                 }
-                TheMenuManager.AllDishes.RemoveAt(index);
+
+                DataAccess da = new DataAccess();
+                da.DeleteDish(SelectedDish);
+
+                //TheMenuManager.AllDishes.RemoveAt(index);
                 Dishes.RemoveAt(index);
+
                 SelectedDish = newSelection;
                 SelectedDishModified = false;
             }
@@ -359,6 +441,19 @@ namespace WpfUI.ViewModels
                 default:
                     return false;
             }
+        }
+
+        private int GetMaxId()
+        {
+            int id = 1;
+            foreach (var d in Dishes)
+            {
+                if (d.Id > id)
+                {
+                    id = d.Id;
+                }
+            }
+            return id;
         }
     }
 }

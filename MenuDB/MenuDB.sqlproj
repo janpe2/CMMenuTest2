@@ -63,6 +63,13 @@
   <ItemGroup>
     <Build Include="dbo\Tables\Dish.sql" />
     <Build Include="dbo\StoredProcedures\spDish_GetByName.sql" />
+    <Build Include="dbo\StoredProcedures\Dish_GetAllDishes.sql" />
+    <Build Include="dbo\StoredProcedures\Dish_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\Dish_Modify.sql" />
+    <Build Include="dbo\StoredProcedures\Dish_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\Dish_GetAllDishesSortedAlphabetically.sql" />
+    <Build Include="dbo\StoredProcedures\Dish_GetById.sql" />
+    <Build Include="dbo\Tables\Category.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MenuDB.publish.xml" />

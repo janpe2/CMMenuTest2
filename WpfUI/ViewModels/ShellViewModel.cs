@@ -39,6 +39,7 @@ namespace WpfUI.ViewModels
 
         public void TestSQL()
         {
+            /*
             DataAccess db = new DataAccess();
             
             Dish dish = db.GetDish("Fish soup");
@@ -50,10 +51,10 @@ namespace WpfUI.ViewModels
             {
                 MessageBox.Show($"{dish.Name} {dish.Description} {dish.Price}");
             }
-            
 
-            /*
-            db.InsertDish("New dish", "Something new stuff", 8.45);
+
+            string newName = $"New dish {new Random().Next(0, 5000)}";
+            db.InsertDish(newName, "Something new food", 8.45);
 
             List<Dish> dishes = db.GetAllDishes();
             StringBuilder sb = new StringBuilder();
