@@ -23,11 +23,14 @@ namespace WpfUI.MenuLibrary
 		/// </summary>
 		public List<Dish> Dishes { get; } = new List<Dish>();
 
-		public Menu.Category Id { get; set; }
+		public int Id { get; set; }
+
+		public Menu.Category CatId { get; set; }
 
 		public MenuCategory(Menu.Category id)
 		{
-			this.Id = id;
+			this.CatId = id;
+			this.Id = (int)id;
 			this.Name = id.ToString();
 		}
 

@@ -11,7 +11,7 @@ namespace WpfUI.ViewModels
 {
     public class CategoryViewModel : Screen
     {
-        //public MenuManager TheMenuManager { get; set; }
+        public MenuManager TheMenuManager { get; set; }
 
         public BindableCollection<Dish> DishesInCategory { get; } = new BindableCollection<Dish>();
 
@@ -20,12 +20,12 @@ namespace WpfUI.ViewModels
         public BindableCollection<Menu> Menus { get; } = new BindableCollection<Menu>();
 
         private MenuCategory _selectedCategory;
-        public MenuCategory SelectedCategory 
-        { 
-            get 
-            { 
-                return _selectedCategory;  
-            } 
+        public MenuCategory SelectedCategory
+        {
+            get
+            {
+                return _selectedCategory;
+            }
             set
             {
                 if (value != null)
@@ -36,11 +36,11 @@ namespace WpfUI.ViewModels
             }
         }
 
-        public string SelectedMenuDescription 
+        public string SelectedMenuDescription
         {
-            get 
-            { 
-                return SelectedMenu.Description; 
+            get
+            {
+                return SelectedMenu.Description;
             }
             set
             {
@@ -50,10 +50,10 @@ namespace WpfUI.ViewModels
         }
 
         private Menu _selectedMenu;
-        public Menu SelectedMenu 
+        public Menu SelectedMenu
         {
-            get 
-            { 
+            get
+            {
                 return _selectedMenu;
             }
             set
@@ -74,8 +74,8 @@ namespace WpfUI.ViewModels
         public List<Dish> AllDishes { get; set; }
 
         private Dish _selectedDishInCategory;
-        public Dish SelectedDishInCategory 
-        { 
+        public Dish SelectedDishInCategory
+        {
             get { return _selectedDishInCategory; }
             set
             {
@@ -88,8 +88,14 @@ namespace WpfUI.ViewModels
 
         private void LoadCategory()
         {
+            DataAccess da = new DataAccess();
+            List<Dish> dishes = da.GetDishesInCategory(SelectedCategory.Id, SelectedMenu.Id);
+
+            SelectedCategory.Dishes.Clear();
+            SelectedCategory.Dishes.AddRange(dishes);
+
             DishesInCategory.Clear();
-            DishesInCategory.AddRange(SelectedCategory.Dishes);
+            DishesInCategory.AddRange(dishes);
 
             if (DishesInCategory.Count == 0)
             {
@@ -107,15 +113,17 @@ namespace WpfUI.ViewModels
         /// Constructor.
         /// </summary>
         /// <param name="manager">menu manager</param>
-        public CategoryViewModel(MenuManager managerxx)
+        public CategoryViewModel(MenuManager manager)
         {
-            //TheMenuManager = manager;
             DataAccess da = new DataAccess();
+            List<Menu> allMenus = da.GetAllMenus();
 
+            TheMenuManager = manager;
+
+            SelectedMenu = allMenus[0];
             CategoryNames = SelectedMenu.Categories;
-            Menus.AddRange(da.GetAllMenus());
-            SelectedMenu = Menus[0];
-            SelectedCategory = SelectedMenu.Categories[0];
+            Menus.AddRange(allMenus);
+            SelectedCategory = SelectedMenu.Categories[0]; 
             AllDishes = da.GetAllDishes();
         }
 
@@ -135,9 +143,12 @@ namespace WpfUI.ViewModels
             Dish dish = SelectedDishInAllDishes;
             if (SelectedCategory.Dishes.Contains(dish))
             {
-                MessageBox.Show($"The dish {dish.Name} is already in category");
+                MessageBox.Show($"The dish {dish.Name} is already in category {SelectedCategory.Id}");
                 return;
             }
+
+            DataAccess da = new DataAccess();
+            da.AddDishToCategory(dish.Id, SelectedCategory.Id, SelectedMenu.Id);
 
             DishesInCategory.Add(dish);
             SelectedCategory.Dishes.Add(dish);
@@ -154,6 +165,10 @@ namespace WpfUI.ViewModels
             }
 
             Dish dish = SelectedDishInCategory;
+
+            DataAccess da = new DataAccess();
+            da.RemoveDishFromCategory(dish.Id, SelectedCategory.Id, SelectedMenu.Id);
+
             DishesInCategory.Remove(dish);
             SelectedCategory.Dishes.Remove(dish);
             SelectedDishInCategory = null;
@@ -161,14 +176,20 @@ namespace WpfUI.ViewModels
         }
         public void AddMenu()
         {
-            string name = AskMenuName("New Menu", "Name for new menu:", "");
+            string name = AskMenuNameOrDescr("New Menu", "Name for new menu:", "");
             if (name == null)
             {
                 return;
             }
 
             Menu menu = new Menu(name, "");
-            new DataAccess().AddMenu(menu);
+
+            DataAccess da = new DataAccess();
+            da.AddMenu(menu);
+            menu.Id = GetMaxMenuIdFromDB(da);
+
+            TheMenuManager.AllMenus.Add(menu);
+
             Menus.Add(menu);
             NotifyOfPropertyChange(() => Menus);
             SelectedMenu = menu;
@@ -177,43 +198,47 @@ namespace WpfUI.ViewModels
         public void DeleteMenu()
         {
             MessageBoxResult messageBoxResult = MessageBox.Show(
-                $"Are you sure you want delete menu {SelectedMenu.Name}?", "Delete Menu", 
+                $"Are you sure you want delete menu {SelectedMenu.Name}?", "Delete Menu",
                 MessageBoxButton.YesNo);
 
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                int index = Menus.IndexOf(SelectedMenu);
+                //int index = TheMenuManager.AllMenus.IndexOf(SelectedMenu);
+                int index = TheMenuManager.AllMenus.FindIndex(x => x.Id == SelectedMenu.Id);
                 Menu newSelection;
 
                 if (index == -1)
                 {
+                    MessageBox.Show("Menu does not exist.");
                     return;
                 }
-                else if (Menus.Count == 1)
+                else if (TheMenuManager.AllMenus.Count == 1)
                 {
                     // TODO
                     return; // newSelection = null;
                 }
                 else if (index == 0)
                 {
-                    newSelection = Menus[1];
+                    newSelection = TheMenuManager.AllMenus[1];
                 }
                 else
                 {
-                    newSelection = Menus[index - 1];
+                    newSelection = TheMenuManager.AllMenus[index - 1];
                 }
+
+                TheMenuManager.AllMenus.RemoveAt(index);
 
                 DataAccess da = new DataAccess();
                 da.DeleteMenu(SelectedMenu);
-                //TheMenuManager.AllMenus.RemoveAt(index);
+
                 Menus.Clear();
-                Menus.AddRange(da.GetAllMenus());
+                Menus.AddRange(TheMenuManager.AllMenus);
                 NotifyOfPropertyChange(() => Menus);
                 SelectedMenu = newSelection;
             }
         }
 
-        private string AskMenuName(string title, string message, string oldName)
+        private string AskMenuNameOrDescr(string title, string message, string oldName)
         {
             var viewModel = IoC.Get<InputBoxViewModel>();
             viewModel.DialogTitle = title;
@@ -236,23 +261,55 @@ namespace WpfUI.ViewModels
                 return;
             }
 
-            string newName = AskMenuName("Rename Menu", "Rename menu to:", SelectedMenu.Name);
+            string newName = AskMenuNameOrDescr("Rename Menu", "Rename menu to:", SelectedMenu.Name);
             if (newName == null)
             {
                 return;
             }
 
+            new DataAccess().ModifyMenu(SelectedMenu, newName, SelectedMenu.Description);
             SelectedMenu.Name = newName;
 
             // Reload the list to force items update in ComboBox
             Menus.Clear();
-            Menus.AddRange(new DataAccess().GetAllMenus());
+            Menus.AddRange(TheMenuManager.AllMenus);
 
             // TODO Selected item disappears in combo box
             NotifyOfPropertyChange(() => Menus);
             NotifyOfPropertyChange(() => SelectedMenu);
         }
 
+        private int GetMaxMenuIdFromDB(DataAccess da)
+        {
+            List<Menu> menus = da.GetAllMenus();
+            int id = 1;
+            foreach (var d in menus)
+            {
+                if (d.Id > id)
+                {
+                    id = d.Id;
+                }
+            }
+            return id;
+        }
+
+        public void SetMenuDescription()
+        {
+            if (SelectedMenu == null)
+            {
+                return;
+            }
+
+            string newDescr = AskMenuNameOrDescr("Menu Description", "Description:", SelectedMenu.Description);
+            if (newDescr == null)
+            {
+                return;
+            }
+
+            new DataAccess().ModifyMenu(SelectedMenu, SelectedMenu.Name, newDescr);
+            SelectedMenu.Description = newDescr;
+            NotifyOfPropertyChange(() => SelectedMenuDescription);
+        }
 
     }
 }

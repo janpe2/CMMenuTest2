@@ -46,6 +46,7 @@ namespace WpfUI.Views
     {
         private System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-US");
 
+
         static PreviewerCustomControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PreviewerCustomControl), 
@@ -61,23 +62,26 @@ namespace WpfUI.Views
             double scaleX = width / widthA4;
             double scaleY = height / heightA4;
             double scale = Math.Min(scaleX, scaleY);
-            double scaledWidth = scale * widthA4;
-            double scaledHeight = scale * heightA4;
-            double x = (width - scaledWidth) / 2;
-            double y = (height - scaledHeight) / 2;
+            //double scaledWidth = scale * widthA4;
+            //double scaledHeight = scale * heightA4;
+            double translateX = (width - scale * widthA4) / 2;
+            double translateY = (height - scale * heightA4) / 2;
 
-            dc.DrawRectangle(Brushes.Azure, new Pen(Brushes.Black, 2.0), 
-                new Rect(x, y, scaledWidth, scaledHeight));
+            dc.PushTransform(new MatrixTransform(scale, 0, 0, scale, translateX, translateY));
+
+            dc.DrawRectangle(Brushes.White, new Pen(Brushes.Black, 2.0), 
+                new Rect(0, 0, widthA4, heightA4));
 
             var text = new FormattedText("Menu",
                     cultureInfo,
                     FlowDirection.LeftToRight, 
                     new Typeface(new FontFamily("Times New Roman"), FontStyles.Italic, FontWeights.Bold, FontStretches.Normal), 
-                    25.0, Brushes.Blue, 1.0);
+                    35.0, Brushes.Maroon, 1.0);
 
-            dc.DrawText(text, new Point(x + 20.0, y + 45.0));
+            dc.DrawText(text, new Point(200.0, 80.0));
 
-            //System.Diagnostics.Trace.WriteLine(width + " " + height);
+
+            dc.Pop(); // pop transform
         }
         
     }

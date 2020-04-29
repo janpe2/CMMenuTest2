@@ -8,14 +8,14 @@ namespace WpfUI.MenuLibrary
     {
         public List<Dish> AllDishes { get; set; } = new List<Dish>();
 
-        public List<MenuCategory> AllCategories { get; set; } = new List<MenuCategory>()
+        /*public List<MenuCategory> AllCategories { get; set; } = new List<MenuCategory>()
         {
-            new MenuCategory(Menu.Category.Starter),
-            new MenuCategory(Menu.Category.MainCourse),
-            new MenuCategory(Menu.Category.Dessert),
-            new MenuCategory(Menu.Category.Drink),
-            new MenuCategory(Menu.Category.Uncategorized),
-        };
+            new MenuCategory(),
+            new MenuCategory(),
+            new MenuCategory(),
+            new MenuCategory(),
+            new MenuCategory(),
+        };*/
         
 
         public List<Menu> AllMenus { get; set; } = new List<Menu>();
@@ -62,7 +62,7 @@ namespace WpfUI.MenuLibrary
 
             AllDishes.Add(dish);
             //AllCategories[(int)category].AddDish(dish);
-            menu.Categories[(int)category].AddDish(dish);
+            //menu.Categories[(int)category].AddDish(dish);
 
             return dish;
         }

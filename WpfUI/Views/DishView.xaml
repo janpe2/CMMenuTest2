@@ -102,10 +102,28 @@
                 <TextBlock Margin="3,0,0,0">Save Changes</TextBlock>
             </StackPanel>
         </Button>
-        <Button Grid.Row="9" Grid.Column="2" x:Name="DiscardChanges" Content="Discard Changes" Margin="3"
-                IsEnabled="{Binding SelectedDishModified}" Padding="3"/>
-        <Button Grid.Row="9" Grid.Column="3" x:Name="DeleteDish" Content="Delete Dish" Margin="3" Padding="3"/>
-        <Button Grid.Row="9" Grid.Column="4" x:Name="AddDish" Content="Add New Dish" Margin="3" Padding="3"/>
+        
+        <Button Grid.Row="9" Grid.Column="2" x:Name="DiscardChanges" Margin="3"
+                IsEnabled="{Binding SelectedDishModified}" Padding="3">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/undo.png" />
+                <TextBlock Margin="3,0,0,0">Discard Changes</TextBlock>
+            </StackPanel>
+        </Button>
+        
+        <Button Grid.Row="9" Grid.Column="3" x:Name="DeleteDish" Margin="3" Padding="3">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/trash.png" />
+                <TextBlock Margin="3,0,0,0">Delete Dish</TextBlock>
+            </StackPanel>
+        </Button>
+        
+        <Button Grid.Row="9" Grid.Column="4" x:Name="AddDish" Margin="3" Padding="3">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/plus_blue.png" />
+                <TextBlock Margin="3,0,0,0">Add New Dish</TextBlock>
+            </StackPanel>
+        </Button>
 
         <!-- Row 10 -->
         

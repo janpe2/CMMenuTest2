@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Text;
 using Dapper;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace WpfUI.MenuLibrary.DataAccess
 {
@@ -18,8 +19,7 @@ namespace WpfUI.MenuLibrary.DataAccess
 
         public Dish GetDishByName(string name)
         {
-            using (IDbConnection connection = 
-                   new System.Data.SqlClient.SqlConnection(CnnVal(CurrentDBName)))
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
                 var list = connection.Query<Dish>("dbo.spDish_GetByName @Name", new { Name = name }).AsList();
                 //var list = connection.Query<Dish>($"select * from Dish where Name='{name}'").AsList();
@@ -30,18 +30,16 @@ namespace WpfUI.MenuLibrary.DataAccess
 
         public Dish GetDishById(int id)
         {
-            using (IDbConnection connection =
-                   new System.Data.SqlClient.SqlConnection(CnnVal(CurrentDBName)))
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
-                var list = connection.Query<Dish>("dbo.spDish_GetById @Id", new { ID = id }).AsList();
+                var list = connection.Query<Dish>("dbo.Dish_GetById @Id", new { Id = id }).AsList();
                 return list.Count == 0 ? null : list[0];
             }
         }
 
         public List<Dish> GetAllDishes()
         {
-            using (IDbConnection connection =
-                   new System.Data.SqlClient.SqlConnection(CnnVal(CurrentDBName)))
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
                 List<Dish> list = connection.Query<Dish>("dbo.Dish_GetAllDishesSortedAlphabetically").AsList();
                 //List<Dish> list = connection.Query<Dish>("select * from Dish").AsList();
@@ -51,23 +49,21 @@ namespace WpfUI.MenuLibrary.DataAccess
 
         public void InsertDish(Dish dish)
         {
-            using (IDbConnection connection =
-                   new System.Data.SqlClient.SqlConnection(CnnVal(CurrentDBName)))
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
-                List<Dish> list = new List<Dish>();
-                list.Add(dish);
+                //List<Dish> list = new List<Dish>();
+                //list.Add(dish);
 
                 //connection.Execute($"insert into Dish (Name, Description) values ('{name}', '{descr}')");
                 connection.Execute(
                     "dbo.Dish_Insert @Name, @Description, @Price, @ContainsLactose, @ContainsGluten, @ContainsFish",
-                    list);
+                    dish);
             }
         }
 
         public void DeleteDish(Dish dish)
         {
-            using (IDbConnection connection =
-                   new System.Data.SqlClient.SqlConnection(CnnVal(CurrentDBName)))
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
                 connection.Execute("dbo.Dish_Delete @Id", new { Id = dish.Id });
             }
@@ -75,8 +71,7 @@ namespace WpfUI.MenuLibrary.DataAccess
 
         public void ModifyDish(Dish dish)
         {
-            using (IDbConnection connection =
-                   new System.Data.SqlClient.SqlConnection(CnnVal(CurrentDBName)))
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
                 List<Dish> list = new List<Dish>();
                 list.Add(dish);
@@ -89,17 +84,77 @@ namespace WpfUI.MenuLibrary.DataAccess
 
         public List<Menu> GetAllMenus()
         {
-            throw new NotImplementedException();
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                List<Menu> list = connection.Query<Menu>("select * from Menu").AsList();
+                return list;
+            }
+        }
+
+        public List<Dish> GetDishesInCategory(int categoryId, int menuId)
+        {
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                List<int> dishIds = connection.Query<int>(
+                    $"select DishId from DishesInCategory where CategoryId='{categoryId}' and MenuId='{menuId}'").AsList();
+                var dishes = connection.Query<Dish>("select * from Dish where Id in @ids", new { ids = dishIds });
+                return dishes.AsList();
+                
+                /*
+                return connection.Query<Dish>("dbo.DishesInCategory_GetDishes @CategoryId, @MenuId",
+                    new { CategoryId = categoryId, MenuId = menuId }).AsList();
+                */
+            }
         }
 
         public void AddMenu(Menu menu)
         {
-            throw new NotImplementedException();
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                connection.Execute($"insert into Menu (Name, Description) values ('{menu.Name}', '{menu.Description}')");
+            }
         }
 
         public void DeleteMenu(Menu menu)
         {
-            throw new NotImplementedException();
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                /*
+                System.Data.SqlClient.SqlException: 'The DELETE statement conflicted with the REFERENCE constraint 
+                "FK_DishesInCategory_Menu". The conflict occurred in database "MenuDataDB", 
+                table "dbo.DishesInCategory", column 'MenuId'.
+                The statement has been terminated.'
+                */
+                connection.Execute($"delete from Menu where Id='{menu.Id}'");
+            }
         }
+
+        public void AddDishToCategory(int dishId, int category, int menuId)
+        {
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                connection.Execute("dbo.DishesInCategory_Insert @DishId, @CategoryId, @MenuId", 
+                    new { DishId = dishId, CategoryId = category, MenuID = menuId });
+            }
+        }
+
+        public void RemoveDishFromCategory(int dishId, int categoryId, int menuId)
+        {
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                connection.Execute(
+                    $"delete from DishesInCategory where DishId='{dishId}' and CategoryId='{categoryId}' and MenuId='{menuId}'");
+            }
+        }
+
+        public void ModifyMenu(Menu menu, string newName, string newDescr)
+        {
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                connection.Execute(
+                    $"update Menu set Name='{newName}', Description='{newDescr}' where Id='{menu.Id}'");
+            }
+        }
+
     }
 }

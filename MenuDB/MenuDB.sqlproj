@@ -70,6 +70,10 @@
     <Build Include="dbo\StoredProcedures\Dish_GetAllDishesSortedAlphabetically.sql" />
     <Build Include="dbo\StoredProcedures\Dish_GetById.sql" />
     <Build Include="dbo\Tables\Category.sql" />
+    <Build Include="dbo\Tables\Menu.sql" />
+    <Build Include="dbo\Tables\DishesInCategory.sql" />
+    <Build Include="dbo\StoredProcedures\DishesInCategory_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\DishesInCategory_GetDishes.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MenuDB.publish.xml" />

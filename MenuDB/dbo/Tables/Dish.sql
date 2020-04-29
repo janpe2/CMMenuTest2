@@ -6,5 +6,5 @@
     [Price] FLOAT NULL, 
     [ContainsLactose] BIT NULL, 
     [ContainsGluten] BIT NULL, 
-    [ContainsFish] BIT NULL
+    [ContainsFish] BIT NULL 
 )

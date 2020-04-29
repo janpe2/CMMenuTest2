@@ -53,7 +53,7 @@
 
         <!-- Row 4 -->
 
-        <TextBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2"
+        <TextBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2" IsReadOnly="True"
                  Text="{Binding Path=SelectedMenuDescription, Mode=TwoWay}" />
 
         <!-- Row 5 -->
@@ -104,6 +104,7 @@
                 <Button x:Name="AddMenu" Content="New" Padding="2" Margin="5" ToolTip="Add a new menu"/>
                 <Button x:Name="DeleteMenu" Content="Delete" Padding="2" Margin="5" ToolTip="Delete selected menu" />
                 <Button x:Name="RenameMenu" Content="Rename" Padding="2" Margin="5" ToolTip="Rename selected menu" />
+                <Button x:Name="SetMenuDescription" Content="Descr" Padding="2" Margin="5" ToolTip="Change description of selected menu" />
             </StackPanel>
         </GroupBox>
 

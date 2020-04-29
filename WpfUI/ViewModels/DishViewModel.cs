@@ -297,13 +297,15 @@ namespace WpfUI.ViewModels
             string descr = "";
             double price = 0.00;
             Dish dish = new Dish(name, descr, price);
-            dish.Id = GetMaxId() + 1;
 
             DataAccess da = new DataAccess();
             da.InsertDish(dish);
-
+            dish.Id = GetMaxIdFromDB(da); // get the Id of the Dish we just added to the database
             Dishes.Add(dish);
             //TheMenuManager.AllDishes.Add(dish);
+
+
+
             SelectedDish = dish;
             SelectedDishModified = false;
         }
@@ -325,12 +327,13 @@ namespace WpfUI.ViewModels
 
             string oldName = _selectedDish.Name, newName = NameOfSelectedDish;
 
-            // TODO This does not find duplicate names!
+            /*// TODO This does not find duplicate names!
             if (IsDishNameInUse(newName, _selectedDish))
             {
                 MessageBox.Show($"Dish named {newName} already exists. Please write a different name.", "Save Dish");
                 return;
             }
+            */
 
             int index = Dishes.IndexOf(SelectedDish);
             bool isRenamed = oldName != newName;
@@ -447,6 +450,20 @@ namespace WpfUI.ViewModels
         {
             int id = 1;
             foreach (var d in Dishes)
+            {
+                if (d.Id > id)
+                {
+                    id = d.Id;
+                }
+            }
+            return id;
+        }
+
+        private int GetMaxIdFromDB(DataAccess da)
+        {
+            List<Dish> dishes = da.GetAllDishes();
+            int id = 1;
+            foreach (var d in dishes)
             {
                 if (d.Id > id)
                 {

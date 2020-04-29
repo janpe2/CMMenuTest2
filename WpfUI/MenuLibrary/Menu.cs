@@ -26,6 +26,8 @@ namespace WpfUI.MenuLibrary
 
         public List<MenuCategory> Categories { get; } = new List<MenuCategory>();
 
+        //public Dictionary<int, MenuCategory> Categories { get; } = new Dictionary<int, MenuCategory>();
+
         public Menu(string name, string descr) : this()
         {
             Name = name;
@@ -34,11 +36,13 @@ namespace WpfUI.MenuLibrary
 
         public Menu()
         {
+            
             Categories.Add(new MenuCategory(Menu.Category.Starter));
             Categories.Add(new MenuCategory(Menu.Category.MainCourse));
             Categories.Add(new MenuCategory(Menu.Category.Dessert));
             Categories.Add(new MenuCategory(Menu.Category.Drink));
             Categories.Add(new MenuCategory(Menu.Category.Uncategorized));
+            
         }
 
         public void AddDish(Category category, string name, string descr, double price)
