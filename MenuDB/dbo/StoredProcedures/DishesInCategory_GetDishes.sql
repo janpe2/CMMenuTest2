@@ -3,7 +3,11 @@
 	@MenuId int
 AS
 begin
-	-- Does not work!
-	select DishesInCategory.DishId from DishesInCategory 
-    join Dish on CategoryId=@CategoryId and MenuId=@MenuId
+    -- Get the column DishId of all records in DishesInCategory table if the record has
+    -- the specified @CategoryId and @MenuId. Then "resolve" the foreign keys DishId
+    -- and get the referenced dishes from Dish table.
+    SELECT Dish.*
+    FROM DishesInCategory
+    INNER JOIN Dish 
+    ON DishesInCategory.DishId=Dish.Id and DishesInCategory.CategoryId=@CategoryId and DishesInCategory.MenuId=@MenuId;
 end

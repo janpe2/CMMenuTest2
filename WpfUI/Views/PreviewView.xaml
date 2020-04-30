@@ -22,10 +22,11 @@
 
         <TextBlock Grid.Row="1" Grid.Column="1" Text="Menu:" Margin="0,0,0,3"/>
 
-        <ComboBox Name="Menus" Grid.Row="2" Grid.Column="1" Margin="0,0,0,7" />
+        <ComboBox Name="Menus" DisplayMemberPath="Name" Grid.Row="2" Grid.Column="1" Margin="0,0,0,7"
+                  SelectedItem="{Binding SelectedMenu}"/>
 
         <PreviewerNamespace:PreviewerCustomControl Grid.Row="3" Grid.Column="1" BorderBrush="Black"
-            MinWidth="100" MinHeight="100" x:Name="PreviewedMenu"/>
+            MinWidth="100" MinHeight="100" x:Name="PreviewedMenu" MenuId="{Binding SelectedMenuId, Mode=TwoWay}"/>
 
     </Grid>
 </UserControl>

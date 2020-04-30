@@ -62,8 +62,8 @@
 
         <!-- Row 6 -->
 
-        <ComboBox x:Name="CategoryNames" Grid.Row="6" Grid.Column="3" DisplayMemberPath="Name"
-                  SelectedItem="{Binding Path=SelectedCategory, Mode=TwoWay}" Grid.ColumnSpan="2" />
+        <ComboBox x:Name="CategoryNames" Grid.Row="6" Grid.Column="3" 
+                  SelectedItem="{Binding Path=SelectedCategoryName, Mode=TwoWay}" Grid.ColumnSpan="2" />
 
         <!-- Row 7 -->
 
