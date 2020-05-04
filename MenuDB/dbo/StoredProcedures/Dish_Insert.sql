@@ -8,5 +8,6 @@
 AS
 begin
 	insert into dbo.Dish (Name, Description, Price, ContainsLactose, ContainsGluten, ContainsFish)
+	output INSERTED.Id  -- return Id of inserted Dish
 	values (@Name, @Description, @Price, @ContainsLactose, @ContainsGluten, @ContainsFish);
 end

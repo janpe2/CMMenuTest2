@@ -46,8 +46,6 @@ namespace WpfUI.Views
     /// </summary>
     public class PreviewerCustomControl : Control
     {
-        private System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-US");
-
         // Create a bindable property, so the name MenuId can be used as a property name in XAML and it can be bound.
         public static readonly DependencyProperty MenuIdProperty =
             DependencyProperty.Register(
@@ -56,6 +54,22 @@ namespace WpfUI.Views
                     default(int), // default value is required
                     FrameworkPropertyMetadataOptions.AffectsRender, // automatic repaint
                     new PropertyChangedCallback(MenuIdPropertyChanged))
+                );
+
+        public static readonly DependencyProperty ShowBorderProperty =
+            DependencyProperty.Register(
+                "ShowBorder", typeof(bool), typeof(PreviewerCustomControl),
+                new FrameworkPropertyMetadata(
+                    default(bool),
+                    FrameworkPropertyMetadataOptions.AffectsRender)
+                );
+
+        public static readonly DependencyProperty ShowOrnamentsProperty =
+            DependencyProperty.Register(
+                "ShowOrnaments", typeof(bool), typeof(PreviewerCustomControl),
+                new FrameworkPropertyMetadata(
+                    default(bool),
+                    FrameworkPropertyMetadataOptions.AffectsRender)
                 );
 
         public int MenuId
@@ -67,6 +81,30 @@ namespace WpfUI.Views
             set 
             { 
                 SetValue(MenuIdProperty, value);
+            }
+        }
+
+        public bool ShowBorder
+        {
+            get
+            {
+                return (bool)GetValue(ShowBorderProperty);
+            }
+            set
+            {
+                SetValue(ShowBorderProperty, value);
+            }
+        }
+
+        public bool ShowOrnaments
+        {
+            get
+            {
+                return (bool)GetValue(ShowOrnamentsProperty);
+            }
+            set
+            {
+                SetValue(ShowOrnamentsProperty, value);
             }
         }
 
@@ -86,6 +124,7 @@ namespace WpfUI.Views
 
         private WpfUI.MenuLibrary.Menu currentMenu;
         private List<Dish> dishes;
+        private System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-US");
 
         static void MenuIdPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
@@ -108,6 +147,17 @@ namespace WpfUI.Views
             var formattedText = new FormattedText(text,
                     cultureInfo, FlowDirection.LeftToRight, font, fontSize, color, 1.0);
             dc.DrawText(formattedText, new Point(x, y));
+
+            double w = formattedText.Width;
+        }
+
+        private void DrawCenteredText(DrawingContext dc, string text, Typeface font, double fontSize,
+            Brush color, double y, double pageWidth)
+        {
+            var formattedText = new FormattedText(text,
+                    cultureInfo, FlowDirection.LeftToRight, font, fontSize, color, 1.0);
+            double x = (pageWidth - formattedText.Width) / 2;
+            dc.DrawText(formattedText, new Point(x, y));
         }
 
         protected override void OnRender(DrawingContext dc)
@@ -129,16 +179,33 @@ namespace WpfUI.Views
 
             dc.PushTransform(new MatrixTransform(scale, 0, 0, scale, translateX, translateY));
 
-            dc.DrawRectangle(Brushes.White, new Pen(Brushes.Black, 2.0), new Rect(0, 0, widthA4, heightA4));
+            dc.DrawRectangle(Brushes.White, new Pen(Brushes.Black, 1.0 / scale), new Rect(0, 0, widthA4, heightA4));
+            if (ShowBorder)
+            {
+                dc.DrawRectangle(Brushes.Transparent, new Pen(Brushes.Maroon, 4.0), new Rect(20, 20, widthA4 - 40, heightA4 - 40));
+                dc.DrawRectangle(Brushes.Transparent, new Pen(Brushes.Maroon, 1.0), new Rect(30, 30, widthA4 - 60, heightA4 - 60)); 
+            }
+            if (ShowOrnaments)
+            {
+                dc.DrawEllipse(Brushes.Transparent, new Pen(Brushes.Maroon, 1.0), new Point(50, 50), 10, 10);
+
+                PathFigure pf = new PathFigure();
+                pf.StartPoint = new Point(40, 60);
+                pf.Segments.Add(new BezierSegment(new Point(90, 90), new Point(90, 30), new Point(140, 60), true));
+                pf.IsFilled = false;
+                PathGeometry geom = new PathGeometry();
+                geom.Figures.Add(pf);
+                dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Maroon, 1.0), geom);
+            }
 
             if (currentMenu == null)
             {
-                DrawText(dc, $"{MenuId}", largeFont, 32.0, Brushes.Maroon, 100.0, 80.0);
+                DrawText(dc, $"{MenuId}", largeFont, 36.0, Brushes.Maroon, 100.0, 65.0);
             }
             else
             {
-                DrawText(dc, $"{currentMenu.Name} (Id {currentMenu.Id})", largeFont, 32.0, Brushes.Maroon, 50.0, 80.0);
-                DrawText(dc, currentMenu.Description, textFont, 15.0, Brushes.Black, 50.0, 120.0);
+                DrawCenteredText(dc, currentMenu.Name, largeFont, 36.0, Brushes.Maroon, 65.0, widthA4);
+                DrawCenteredText(dc, currentMenu.Description, descrFont, 15.0, Brushes.Black, 110.0, widthA4);
             }
 
             if (dishes != null && dishes.Count > 0)
@@ -146,9 +213,9 @@ namespace WpfUI.Views
                 double y = 150;
                 foreach (var dish in dishes)
                 {
-                    DrawText(dc, $"{dish.Name}   {dish.Price} €", textFont, 16.0, Brushes.Black, 60.0, y);
+                    DrawText(dc, $"{dish.Name} {dish.Price} €", textFont, 16.0, Brushes.Black, 60.0, y);
                     DrawText(dc, dish.Description, descrFont, 14.0, Brushes.Gray, 60.0, y + 20);
-                    y += 40;
+                    y += 50;
                 }
             }
 

@@ -74,6 +74,11 @@
     <Build Include="dbo\Tables\DishesInCategory.sql" />
     <Build Include="dbo\StoredProcedures\DishesInCategory_Insert.sql" />
     <Build Include="dbo\StoredProcedures\DishesInCategory_GetDishes.sql" />
+    <Build Include="dbo\StoredProcedures\DishesInCategory_DeleteDish.sql" />
+    <Build Include="dbo\StoredProcedures\DishesInCategory_GetMenu.sql" />
+    <Build Include="dbo\StoredProcedures\DishesInCategory_DeleteMenu.sql" />
+    <Build Include="dbo\StoredProcedures\Menu_Modify.sql" />
+    <Build Include="dbo\StoredProcedures\Menu_Insert.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MenuDB.publish.xml" />

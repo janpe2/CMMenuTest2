@@ -24,6 +24,28 @@ namespace WpfUI.ViewModels
             }
         }
 
+        private bool _showBorderSelected = true;
+        public bool ShowBorderSelected
+        {
+            get { return _showBorderSelected; }
+            set 
+            {
+                _showBorderSelected = value;
+                NotifyOfPropertyChange(() => ShowBorderSelected);
+            }
+        }
+
+        private bool _showOrnamentsSelected = true;
+        public bool ShowOrnamentsSelected
+        {
+            get { return _showOrnamentsSelected; }
+            set
+            {
+                _showOrnamentsSelected = value;
+                NotifyOfPropertyChange(() => ShowOrnamentsSelected);
+            }
+        }
+
         public int SelectedMenuId { get; set; }
 
         public PreviewViewModel()

@@ -47,13 +47,19 @@ namespace WpfUI.MenuLibrary.DataAccess
             }
         }
 
-        public void InsertDish(Dish dish)
+        /// <summary>
+        /// Inserts a new dish into SQL data base.
+        /// </summary>
+        /// <param name="dish">dish to be added</param>
+        /// <returns>Id of the added dish</returns>
+        public int InsertDish(Dish dish)
         {
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
-                connection.Execute(
-                    "dbo.Dish_Insert @Name, @Description, @Price, @ContainsLactose, @ContainsGluten, @ContainsFish",
-                    dish);
+                //connection.Execute("dbo.Dish_Insert @Name, @Description, @Price, @ContainsLactose, @ContainsGluten, @ContainsFish", dish);
+                List<int> list = connection.Query<int>(
+                    "dbo.Dish_Insert @Name, @Description, @Price, @ContainsLactose, @ContainsGluten, @ContainsFish", dish).AsList();
+                return list[0];
             }
         }
 
@@ -62,7 +68,8 @@ namespace WpfUI.MenuLibrary.DataAccess
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
                 // Remove the dish from all menus first to avoid a SqlException
-                connection.Execute($"delete from DishesInCategory where DishId='{dish.Id}'");
+                connection.Execute("dbo.DishesInCategory_DeleteDish @DishId", new { DishId = dish.Id });
+                //connection.Execute($"delete from DishesInCategory where DishId='{dish.Id}'");
 
                 connection.Execute("dbo.Dish_Delete @Id", new { Id = dish.Id });
             }
@@ -85,7 +92,8 @@ namespace WpfUI.MenuLibrary.DataAccess
         {
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
-                List<Menu> list = connection.Query<Menu>($"select * from Menu where Id='{menuId}'").AsList();
+                //List<Menu> list = connection.Query<Menu>($"select * from Menu where Id='{menuId}'").AsList();
+                List<Menu> list = connection.Query<Menu>("dbo.DishesInCategory_GetMenu @MenuId", new { MenuId = menuId }).AsList();
                 return list.Count == 0 ? null : list[0];
             }
         }
@@ -94,7 +102,7 @@ namespace WpfUI.MenuLibrary.DataAccess
         {
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
-                List<Menu> list = connection.Query<Menu>("select * from Menu").AsList();
+                List<Menu> list = connection.Query<Menu>("select * from Menu order by Name").AsList();
                 return list;
             }
         }
@@ -110,10 +118,8 @@ namespace WpfUI.MenuLibrary.DataAccess
                 return dishes.AsList();
                 */
                 
-                
                 return connection.Query<Dish>("dbo.DishesInCategory_GetDishes @CategoryId, @MenuId",
                     new { CategoryId = categoryId, MenuId = menuId }).AsList();
-                
             }
         }
 
@@ -121,7 +127,9 @@ namespace WpfUI.MenuLibrary.DataAccess
         {
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
-                connection.Execute($"insert into Menu (Name, Description) values ('{menu.Name}', '{menu.Description}')");
+                //connection.Execute($"insert into Menu (Name, Description) values ('{menu.Name}', '{menu.Description}')");
+                connection.Execute($"dbo.Menu_Insert @Name, @Description", 
+                    new { Name = menu.Name, Description = menu.Description });
             }
         }
 
@@ -130,7 +138,8 @@ namespace WpfUI.MenuLibrary.DataAccess
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
                 // Remove the menu from DishesInCategory first to avoid a SqlException
-                connection.Execute($"delete from DishesInCategory where MenuId='{menu.Id}'");
+                connection.Execute("dbo.DishesInCategory_DeleteMenu @MenuId", new { MenuId = menu.Id });
+                //connection.Execute($"delete from DishesInCategory where MenuId='{menu.Id}'");
 
                 connection.Execute($"delete from Menu where Id='{menu.Id}'");
             }
@@ -158,8 +167,9 @@ namespace WpfUI.MenuLibrary.DataAccess
         {
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
             {
-                connection.Execute(
-                    $"update Menu set Name='{newName}', Description='{newDescr}' where Id='{menu.Id}'");
+                //connection.Execute($"update Menu set Name='{newName}', Description='{newDescr}' where Id='{menu.Id}'");
+                connection.Execute("dbo.Menu_Modify @NewName, @NewDescr, @MenuId", 
+                    new { NewName = newName, NewDescr = newDescr, MenuId = menu.Id });
             }
         }
 

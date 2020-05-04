@@ -299,8 +299,8 @@ namespace WpfUI.ViewModels
             Dish dish = new Dish(name, descr, price);
 
             DataAccess da = new DataAccess();
-            da.InsertDish(dish);
-            dish.Id = GetMaxIdFromDB(da); // get the Id of the Dish we just added to the database
+            int id = da.InsertDish(dish);
+            dish.Id = id; // GetMaxIdFromDB(da); // get the Id of the Dish we just added to the database
             Dishes.Add(dish);
             //TheMenuManager.AllDishes.Add(dish);
 

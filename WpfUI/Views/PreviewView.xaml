@@ -20,13 +20,31 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="Menu:" Margin="0,0,0,3"/>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,7">
+            <TextBlock Text="Menu:" Margin="0,0,7,3" VerticalAlignment="Center"/>
 
-        <ComboBox Name="Menus" DisplayMemberPath="Name" Grid.Row="2" Grid.Column="1" Margin="0,0,0,7"
-                  SelectedItem="{Binding SelectedMenu}"/>
+            <ComboBox Name="Menus" DisplayMemberPath="Name"  
+                      SelectedItem="{Binding SelectedMenu}" VerticalAlignment="Center"/>
+
+            <TextBlock Text="Theme:" Margin="5,0,7,3" VerticalAlignment="Center"/>
+
+            <ComboBox Name="Themes" VerticalAlignment="Center"/>
+
+            <CheckBox Name="Border" Content="Border" 
+                      IsChecked="{Binding ShowBorderSelected, Mode=TwoWay}" Margin="6,0,0,0" VerticalAlignment="Center" />
+
+            <CheckBox Name="Ornaments" Content="Ornaments" 
+                      IsChecked="{Binding ShowOrnamentsSelected, Mode=TwoWay}" Margin="6,0,0,0" VerticalAlignment="Center" />
+
+            
+        </StackPanel>
+
 
         <PreviewerNamespace:PreviewerCustomControl Grid.Row="3" Grid.Column="1" BorderBrush="Black"
-            MinWidth="100" MinHeight="100" x:Name="PreviewedMenu" MenuId="{Binding SelectedMenuId, Mode=TwoWay}"/>
+            MinWidth="100" MinHeight="100" x:Name="PreviewedMenu" 
+            MenuId="{Binding SelectedMenuId, Mode=TwoWay}"
+            ShowBorder="{Binding ShowBorderSelected, Mode=TwoWay}"
+            ShowOrnaments="{Binding ShowOrnamentsSelected, Mode=TwoWay}"/>
 
     </Grid>
 </UserControl>
