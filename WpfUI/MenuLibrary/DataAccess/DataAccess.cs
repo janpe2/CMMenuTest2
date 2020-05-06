@@ -123,6 +123,23 @@ namespace WpfUI.MenuLibrary.DataAccess
             }
         }
 
+        public List<List<Dish>> GetAllDishesInAllCategories(int menuId)
+        {
+            using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))
+            {
+                List<List<Dish>> all = new List<List<Dish>>();
+
+                foreach (var cat in Enum.GetValues(typeof(Menu.Category)))
+                {
+                    List<Dish> list = connection.Query<Dish>("dbo.DishesInCategory_GetDishes @CategoryId, @MenuId",
+                        new { CategoryId = (int)cat, MenuId = menuId }).AsList();
+                    all.Add(list);
+                }
+
+                return all;
+            }
+        }
+
         public void AddMenu(Menu menu)
         {
             using (IDbConnection connection = new SqlConnection(CnnVal(CurrentDBName)))

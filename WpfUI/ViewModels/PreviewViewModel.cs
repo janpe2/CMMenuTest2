@@ -1,15 +1,40 @@
 ﻿using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
+using System.Windows.Media;
 using WpfUI.MenuLibrary;
 using WpfUI.MenuLibrary.DataAccess;
+using Color = System.Windows.Media.Color;
 
 namespace WpfUI.ViewModels
 {
     public class PreviewViewModel : Screen
     {
         public List<Menu> Menus { get; set; } = new List<Menu>();
+
+        public Color SelectedColor { get; set; } = Colors.Red;
+
+        private string _selectedColorName = "System.Windows.Media.Color Red";
+        public string SelectedColorName 
+        { 
+            get { return _selectedColorName; }
+            set
+            {
+                try
+                {
+                    _selectedColorName = value;
+                    SelectedColor = (Color)System.Windows.Media.ColorConverter.ConvertFromString(
+                        value.Replace("System.Windows.Media.Color ", ""));
+                }
+                catch(Exception)
+                {
+
+                }
+                NotifyOfPropertyChange(() => SelectedColor);
+            }
+        }
 
         private Menu _selectedMenu;
         public Menu SelectedMenu
@@ -54,6 +79,11 @@ namespace WpfUI.ViewModels
             List<Menu> allMenus = da.GetAllMenus();
             Menus.AddRange(allMenus);
             SelectedMenu = allMenus[0];
+        }
+
+        public void SavePDF()
+        {
+
         }
     }
 }

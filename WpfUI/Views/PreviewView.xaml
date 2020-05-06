@@ -6,6 +6,12 @@
              xmlns:local="clr-namespace:WpfUI.Views"
              xmlns:PreviewerNamespace="clr-namespace:WpfUI.Views"
              mc:Ignorable="d" Background="#FFE2E7F0">
+
+    <UserControl.Resources>
+        <ObjectDataProvider ObjectInstance="{x:Type Colors}" 
+                MethodName="GetProperties" x:Key="colorPropertiesProvider" />
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
@@ -26,25 +32,28 @@
             <ComboBox Name="Menus" DisplayMemberPath="Name"  
                       SelectedItem="{Binding SelectedMenu}" VerticalAlignment="Center"/>
 
-            <TextBlock Text="Theme:" Margin="5,0,7,3" VerticalAlignment="Center"/>
+            <TextBlock Text="Color:" Margin="5,0,7,3" VerticalAlignment="Center"/>
 
-            <ComboBox Name="Themes" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource colorPropertiesProvider}}"
+                DisplayMemberPath="Name" VerticalAlignment="Center"
+                SelectedItem="{Binding SelectedColorName, Mode=TwoWay}" />
 
-            <CheckBox Name="Border" Content="Border" 
-                      IsChecked="{Binding ShowBorderSelected, Mode=TwoWay}" Margin="6,0,0,0" VerticalAlignment="Center" />
+            <CheckBox Name="Border" Content="Border" Margin="6,0,0,0"
+                      IsChecked="{Binding ShowBorderSelected, Mode=TwoWay}" VerticalAlignment="Center" />
 
-            <CheckBox Name="Ornaments" Content="Ornaments" 
-                      IsChecked="{Binding ShowOrnamentsSelected, Mode=TwoWay}" Margin="6,0,0,0" VerticalAlignment="Center" />
+            <CheckBox Name="Ornaments" Content="Ornaments" Margin="6,0,0,0"
+                      IsChecked="{Binding ShowOrnamentsSelected, Mode=TwoWay}" VerticalAlignment="Center" />
 
-            
+            <Button Name="SavePDF" Content="Save PDF" Padding="3" Margin="6,0,0,0"/>
+
         </StackPanel>
-
 
         <PreviewerNamespace:PreviewerCustomControl Grid.Row="3" Grid.Column="1" BorderBrush="Black"
             MinWidth="100" MinHeight="100" x:Name="PreviewedMenu" 
             MenuId="{Binding SelectedMenuId, Mode=TwoWay}"
             ShowBorder="{Binding ShowBorderSelected, Mode=TwoWay}"
-            ShowOrnaments="{Binding ShowOrnamentsSelected, Mode=TwoWay}"/>
+            ShowOrnaments="{Binding ShowOrnamentsSelected, Mode=TwoWay}"
+            ThemeColor="{Binding SelectedColor, Mode=TwoWay}"/>
 
     </Grid>
 </UserControl>
