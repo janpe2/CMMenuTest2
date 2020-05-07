@@ -81,6 +81,14 @@ namespace WpfUI.Views
                     FrameworkPropertyMetadataOptions.AffectsRender)
                 );
 
+        public static readonly DependencyProperty MenuBackgroundColorProperty =
+            DependencyProperty.Register(
+                "MenuBackgroundColor", typeof(Color), typeof(PreviewerCustomControl),
+                new FrameworkPropertyMetadata(
+                    default(Color),
+                    FrameworkPropertyMetadataOptions.AffectsRender)
+                );
+
         public int MenuId
         {
             get 
@@ -129,6 +137,18 @@ namespace WpfUI.Views
             }
         }
 
+        public Color MenuBackgroundColor
+        {
+            get
+            {
+                return (Color)GetValue(MenuBackgroundColorProperty);
+            }
+            set
+            {
+                SetValue(MenuBackgroundColorProperty, value);
+            }
+        }
+
         private MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator();
 
         private void LoadMenu()
@@ -166,9 +186,11 @@ namespace WpfUI.Views
             double translateY = (height - scale * pageHeight) / 2;
 
             dc.PushTransform(new MatrixTransform(scale, 0, 0, scale, translateX, translateY));
-            dc.DrawRectangle(Brushes.White, new Pen(Brushes.Black, 1.0 / scale), new Rect(0, 0, pageWidth, pageHeight));
 
-            graphicsCreator.Start(new ScreenGraphicsContext(dc), ThemeColor);
+            dc.DrawRectangle(new SolidColorBrush(MenuBackgroundColor), new Pen(Brushes.Black, 1.0 / scale), 
+                new Rect(0, 0, pageWidth, pageHeight));
+                
+            graphicsCreator.Start(new ScreenGraphicsContext(dc), ThemeColor, null);
             graphicsCreator.DrawMenu(ShowBorder, ShowOrnaments);
             graphicsCreator.End();
 

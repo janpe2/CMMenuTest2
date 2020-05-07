@@ -7,11 +7,6 @@
              xmlns:PreviewerNamespace="clr-namespace:WpfUI.Views"
              mc:Ignorable="d" Background="#FFE2E7F0">
 
-    <UserControl.Resources>
-        <ObjectDataProvider ObjectInstance="{x:Type Colors}" 
-                MethodName="GetProperties" x:Key="colorPropertiesProvider" />
-    </UserControl.Resources>
-    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
@@ -34,9 +29,31 @@
 
             <TextBlock Text="Color:" Margin="5,0,7,3" VerticalAlignment="Center"/>
 
-            <ComboBox ItemsSource="{Binding Source={StaticResource colorPropertiesProvider}}"
-                DisplayMemberPath="Name" VerticalAlignment="Center"
-                SelectedItem="{Binding SelectedColorName, Mode=TwoWay}" />
+            <ComboBox ItemsSource="{Binding AllColorNames}" VerticalAlignment="Center"
+                SelectedItem="{Binding SelectedColorName, Mode=TwoWay}" >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Border BorderThickness="0" Height="12" Width="20" Background="{Binding}"/>
+                            <TextBlock Text="{Binding}" Margin="5,0,0,0" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            
+            <TextBlock Text="Background:" Margin="5,0,7,3" VerticalAlignment="Center"/>
+
+            <ComboBox ItemsSource="{Binding AllColorNames}" VerticalAlignment="Center"
+                SelectedItem="{Binding SelectedBackgroundColorName, Mode=TwoWay}" >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Border BorderThickness="0" Height="12" Width="20" Background="{Binding}"/>
+                            <TextBlock Text="{Binding}" Margin="5,0,0,0" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
 
             <CheckBox Name="Border" Content="Border" Margin="6,0,0,0"
                       IsChecked="{Binding ShowBorderSelected, Mode=TwoWay}" VerticalAlignment="Center" />
@@ -53,7 +70,8 @@
             MenuId="{Binding SelectedMenuId, Mode=TwoWay}"
             ShowBorder="{Binding ShowBorderSelected, Mode=TwoWay}"
             ShowOrnaments="{Binding ShowOrnamentsSelected, Mode=TwoWay}"
-            ThemeColor="{Binding SelectedColor, Mode=TwoWay}"/>
+            ThemeColor="{Binding SelectedColor, Mode=TwoWay}"
+            MenuBackgroundColor="{Binding SelectedBackgroundColor, Mode=TwoWay}"/>
 
     </Grid>
 </UserControl>

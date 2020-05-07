@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
 using System.Text;
+using System.Windows;
 using System.Windows.Media;
 using WpfUI.MenuLibrary;
 using WpfUI.MenuLibrary.DataAccess;
@@ -14,25 +16,38 @@ namespace WpfUI.ViewModels
     {
         public List<Menu> Menus { get; set; } = new List<Menu>();
 
-        public Color SelectedColor { get; set; } = Colors.Red;
+        public List<string> AllColorNames { get; set; } = LoadColorNames();
 
-        private string _selectedColorName = "System.Windows.Media.Color Red";
+        public Color SelectedColor { get; set; } = Colors.Red;
+        public Color SelectedBackgroundColor { get; set; } = Colors.White;
+
+        private string _selectedColorName = "Red";
         public string SelectedColorName 
         { 
-            get { return _selectedColorName; }
+            get 
+            { 
+                return _selectedColorName;
+            }
             set
             {
-                try
-                {
-                    _selectedColorName = value;
-                    SelectedColor = (Color)System.Windows.Media.ColorConverter.ConvertFromString(
-                        value.Replace("System.Windows.Media.Color ", ""));
-                }
-                catch(Exception)
-                {
-
-                }
+                SelectedColor = ParseColor(value, SelectedColor);
+                _selectedColorName = value;
                 NotifyOfPropertyChange(() => SelectedColor);
+            }
+        }
+
+        private string _selectedBackgroundColorName = "White";
+        public string SelectedBackgroundColorName
+        {
+            get
+            {
+                return _selectedBackgroundColorName;
+            }
+            set
+            {
+                SelectedBackgroundColor = ParseColor(value, SelectedBackgroundColor);
+                _selectedBackgroundColorName = value;
+                NotifyOfPropertyChange(() => SelectedBackgroundColor);
             }
         }
 
@@ -81,9 +96,33 @@ namespace WpfUI.ViewModels
             SelectedMenu = allMenus[0];
         }
 
+        private static List<string> LoadColorNames()
+        {
+            PropertyInfo[] properties = typeof(Colors).GetProperties();
+            List<string> names = new List<string>();
+            foreach (PropertyInfo p in properties)
+            {
+                names.Add(p.Name);
+            }
+            return names;
+        }
+
+        private Color ParseColor(string str, Color defaultColor)
+        {
+            try
+            {
+                return (Color)System.Windows.Media.ColorConverter.ConvertFromString(str);
+            }
+            catch (Exception)
+            {
+                return defaultColor;
+            }
+        }
+
         public void SavePDF()
         {
 
+            
         }
     }
 }

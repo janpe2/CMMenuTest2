@@ -15,6 +15,7 @@ namespace WpfUI.MenuLibrary
         private Menu menu;
         private List<List<Dish>> dishes;
         private Brush themeColorBrush = Brushes.Red;
+        private Brush pageBackground;
 
         public MenuGraphicsCreator()
         {
@@ -35,9 +36,10 @@ namespace WpfUI.MenuLibrary
             }
         }
 
-        public void Start(IGraphicsContext gc, System.Windows.Media.Color themeColor)
+        public void Start(IGraphicsContext gc, System.Windows.Media.Color themeColor, Brush pageBackground)
         {
             this.gc = gc;
+            this.pageBackground = pageBackground;
             themeColorBrush = new SolidColorBrush(themeColor);
         }
 
@@ -48,16 +50,22 @@ namespace WpfUI.MenuLibrary
 
         public void DrawMenu(bool showBorder, bool showOrnaments)
         {
-            if (menu == null)
+            if (pageBackground != null)
             {
-                return;
+                gc.DrawRectangle(20, 20, PAGE_WIDTH, PAGE_HEIGHT, pageBackground, Brushes.Transparent, 4.0);
             }
 
             FontFamily fontFamily = new FontFamily("Times New Roman");
-            Typeface largeFont = new Typeface(fontFamily, FontStyles.Italic, FontWeights.Bold, FontStretches.Normal);
-            Typeface textFont = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            Typeface menuNameFont = new Typeface(fontFamily, FontStyles.Italic, FontWeights.Bold, FontStretches.Normal);
+            if (menu == null)
+            {
+                gc.DrawText("No Menu", menuNameFont, 36.0, themeColorBrush, 0, 75.0, true);
+                return;
+            }
+
+            Typeface dishNameFont = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
             Typeface descrFont = new Typeface(fontFamily, FontStyles.Italic, FontWeights.Normal, FontStretches.Normal);
-            Typeface categoryFont = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
+            Typeface categoryNameFont = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
 
             if (showBorder)
             {
@@ -72,7 +80,7 @@ namespace WpfUI.MenuLibrary
                 gc.DrawCurve(549, 782, 480, 748, 399, 835, 358, 778, themeColorBrush, 2.0);
             }
 
-            gc.DrawText(menu.Name, largeFont, 36.0, themeColorBrush, 0, 75.0, true);
+            gc.DrawText(menu.Name, menuNameFont, 36.0, themeColorBrush, 0, 75.0, true);
             gc.DrawText(menu.Description, descrFont, 15.0, Brushes.Black, 0, 115.0, true);
             int category = 0;
 
@@ -83,13 +91,13 @@ namespace WpfUI.MenuLibrary
                 {
                     if (dishesInCategory.Count > 0)
                     {
-                        gc.DrawText($"{(Menu.Category)category}", categoryFont, 16.0, Brushes.Black, 55.0, y, false);
+                        gc.DrawText($"{(Menu.Category)category}", categoryNameFont, 16.0, Brushes.Black, 55.0, y, false);
                         y += 18;
                         gc.DrawLine(55, y, 530, y, themeColorBrush, 1.0);
                         y += 5;
                         foreach (Dish dish in dishesInCategory)
                         {
-                            gc.DrawText($"{dish.Name} {dish.Price} €", textFont, 14.0, Brushes.Black, 75.0, y, false);
+                            gc.DrawText($"{dish.Name} {dish.Price} €", dishNameFont, 14.0, Brushes.Black, 75.0, y, false);
                             y += 16;
                             gc.DrawText(dish.Description, descrFont, 12.0, Brushes.Gray, 75.0, y, false);
                             y += 17; 

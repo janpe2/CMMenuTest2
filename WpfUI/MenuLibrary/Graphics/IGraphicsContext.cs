@@ -7,13 +7,6 @@ namespace WpfUI.MenuLibrary
 {
     public interface IGraphicsContext
     {
-        /*
-        public const string FONT_TIMES_ROMAN = "Times New Roman";
-        public const string FONT_TIMES_ITALIC = "Times New Roman";
-        public const string FONT_TIMES_BOLD = "Times New Roman";
-        public const string FONT_TIMES_BOLD_ITALIC = "Times New Roman";
-        */
-
         public void DrawText(string text, Typeface font, double fontSize,
             Brush brush, double x, double y, Boolean horCenterOnPage);
 
