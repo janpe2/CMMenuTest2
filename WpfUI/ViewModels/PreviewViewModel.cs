@@ -18,10 +18,10 @@ namespace WpfUI.ViewModels
 
         public List<string> AllColorNames { get; set; } = LoadColorNames();
 
-        public Color SelectedColor { get; set; } = Colors.Red;
+        public Color SelectedColor { get; set; } = Colors.MediumBlue;
         public Color SelectedBackgroundColor { get; set; } = Colors.White;
 
-        private string _selectedColorName = "Red";
+        private string _selectedColorName = "MediumBlue";
         public string SelectedColorName 
         { 
             get 
@@ -121,7 +121,7 @@ namespace WpfUI.ViewModels
 
         public void SavePDF()
         {
-
+            
             
         }
     }
