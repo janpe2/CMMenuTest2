@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WpfUI.PDFLibrary.Types
+namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type integer.
+    /// PDF data type <c>integer</c>.
     /// </summary>
     public class PDFInt : PDFObject
     {

@@ -1,0 +1,66 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows.Media;
+using Point = System.Windows.Point;
+using Pen = System.Windows.Media.Pen;
+using Brush = System.Windows.Media.Brush;
+using Brushes = System.Windows.Media.Brushes;
+using PDFLibrary;
+
+namespace WpfUI.MenuLibrary.Graphics
+{
+    public class PDFGraphicsContext : IGraphicsContext
+    {
+        private PDFCreator pdfCreator;
+
+
+        public PDFGraphicsContext(PDFCreator pc)
+        {
+            pdfCreator = pc;
+        }
+
+        public void DrawText(string text, Typeface font, double fontSize,
+            Brush brush, double x, double y, Boolean horCenterOnPage)
+        {
+
+        }
+
+        public void DrawLine(double x0, double y0, double x1, double y1,
+            Brush strokeBrush, double lineWidth)
+        {
+            
+        }
+
+        public void DrawRectangle(double x, double y, double width, double height,
+            Brush strokeBrush, Brush fillBrush, double lineWidth)
+        {
+            pdfCreator.DrawRectangle(x, y, width, height, 
+                GetPDFColor(strokeBrush), GetPDFColor(fillBrush), lineWidth);
+        }
+
+        public void DrawCurve(double x0, double y0, double x1, double y1, double x2, double y2,
+            double x3, double y3, Brush strokeBrush, double lineWidth)
+        {
+
+        }
+
+        private PDFColor GetPDFColor(Brush brush)
+        {
+            if (brush == Brushes.Transparent || brush == null)
+            {
+                return null;
+            }
+
+            SolidColorBrush solidBrush = brush as SolidColorBrush;
+
+            if (solidBrush != null)
+            {
+                Color color = solidBrush.Color;
+                return new PDFColor(color.R / 255.0, color.G / 255.0, color.B / 255.0);
+            }
+
+            return new PDFColor(0, 0, 0); // black
+        }
+    }
+}

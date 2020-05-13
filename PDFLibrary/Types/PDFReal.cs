@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WpfUI.PDFLibrary.Types
+namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type real number.
+    /// PDF data type <c>real</c> number.
     /// </summary>
     public class PDFReal : PDFObject
     {
@@ -13,7 +13,12 @@ namespace WpfUI.PDFLibrary.Types
 
         public PDFReal(double value)
         {
-            this.Value = Value;
+            this.Value = value;
+        }
+
+        public override string ToString()
+        {
+            return RealToString(Value);
         }
 
         public static string RealToString(double value)
@@ -22,11 +27,5 @@ namespace WpfUI.PDFLibrary.Types
             // Exponential notation is not allowed in PDF.
             return value.ToString("F3", System.Globalization.CultureInfo.InvariantCulture);
         }
-
-        public override string ToString()
-        {
-            return RealToString(Value);
-        }
-
     }
 }

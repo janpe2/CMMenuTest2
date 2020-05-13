@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WpfUI.PDFLibrary.Types
+namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type boolean.
+    /// PDF data type <c>boolean</c>.
     /// </summary>
     public class PDFBoolean : PDFObject
     {

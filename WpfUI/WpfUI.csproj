@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PDFLibrary\PDFLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="menumaster.ico" />
     <Resource Include="Views\Images\check_green.png" />
     <Resource Include="Views\Images\exclam_red.png" />
