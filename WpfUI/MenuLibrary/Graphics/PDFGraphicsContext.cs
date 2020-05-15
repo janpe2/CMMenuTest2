@@ -29,7 +29,7 @@ namespace WpfUI.MenuLibrary.Graphics
         public void DrawLine(double x0, double y0, double x1, double y1,
             Brush strokeBrush, double lineWidth)
         {
-            
+            pdfCreator.DrawLine(x0, y0, x1, y1, GetPDFColor(strokeBrush), lineWidth);
         }
 
         public void DrawRectangle(double x, double y, double width, double height,
@@ -42,7 +42,7 @@ namespace WpfUI.MenuLibrary.Graphics
         public void DrawCurve(double x0, double y0, double x1, double y1, double x2, double y2,
             double x3, double y3, Brush strokeBrush, double lineWidth)
         {
-
+            pdfCreator.DrawCurve(x0, y0, x1, y1, x2, y2, x3, y3, GetPDFColor(strokeBrush), lineWidth);
         }
 
         private PDFColor GetPDFColor(Brush brush)

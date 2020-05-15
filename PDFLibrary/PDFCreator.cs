@@ -10,71 +10,79 @@ namespace PDFLibrary
     public class PDFCreator
     {
         private List<PDFObject> indirectObjects = new List<PDFObject>();
+        private List<PDFDictionary> pageDictionaries = new List<PDFDictionary>();
+        private List<PDFStream> pageContentStreams = new List<PDFStream>();
         private int objectNumberCounter = 1;
-        private int pageCount = 1; // TODO value 1 only for testing
         private PDFDictionary trailerDictionary;
-        private PDFStream singlePageContentStream; // TODO remove when we have more than 1 page
+        private PDFDictionary currentPageDictionary;
+        private PDFStream currentContentStream;
+        private PDFArray pageKidsArray;
+        private PDFDictionary pagesDictionary;
+        private PDFDictionary currentPageResources;
+        private PDFArray mediaBox;
+        private List<PDFDictionary> resourcesForEachPage = new List<PDFDictionary>();
 
         public PDFCreator()
         {
-            singlePageContentStream = CreateContentStream(PDFStream.Filter.None);
+            pageKidsArray = CreateIndirectArray();
+            mediaBox = new PDFArray(PDFObject.DirectObject,
+                new PDFReal(0.0), new PDFReal(0.0), new PDFReal(595.2756), new PDFReal(841.8898)); // A4
+
+            pagesDictionary = CreateIndirectDictionary();
+            pagesDictionary.Put("Type", new PDFName("Pages"));
+            pagesDictionary.Put("Kids", pageKidsArray);
+            //pagesDictionary.Put("Resources", resources); // all PDF pages inherit these resources
+
+            PDFDictionary catalog = CreateIndirectDictionary();
+            catalog.Put("Type", new PDFName("Catalog"));
+            catalog.Put("Pages", pagesDictionary);
+
+            PDFDictionary infoDictionary = CreateIndirectDictionary();
+            infoDictionary.Put("Creator", new PDFString("Menu Master"));
+            //infoDictionary.Put("CreationDate", GetCreationDateString());
+
+            PDFString fileIdString = PDFString.CreateFileIDString();
+
+            trailerDictionary = new PDFDictionary(PDFObject.DirectObject);
+            trailerDictionary.Put("Root", catalog);
+            trailerDictionary.Put("ID", new PDFArray(PDFObject.DirectObject, fileIdString, fileIdString));
+            trailerDictionary.Put("Info", infoDictionary);
+
+            // PDF must have at least one page
+            AddPage(); 
         }
 
-        private void CreatePDFObjects()
+        /// <summary>
+        /// Adds a new page to PDF and creates the needed PDF objects.
+        /// </summary>
+        public void AddPage()
         {
+            currentPageResources = CreateIndirectDictionary();
+            resourcesForEachPage.Add(currentPageResources);
+
             PDFDictionary testFont = CreateIndirectDictionary();
             testFont.Put("Type", new PDFName("Font"));
             testFont.Put("Subtype", new PDFName("Type1"));
             testFont.Put("BaseFont", new PDFName("Times-Roman"));
             testFont.Put("Encoding", new PDFName("WinAnsiEncoding"));
-
+            
             PDFDictionary fontResources = CreateIndirectDictionary();
             fontResources.Put("F1", testFont);
+            currentPageResources.Put("Font", fontResources);
 
-            PDFDictionary resources = CreateIndirectDictionary();
-            resources.Put("Font", fontResources);
+            currentContentStream = CreateContentStream(PDFStream.Filter.None);
+            pageContentStreams.Add(currentContentStream);
+            currentContentStream.WriteData(GetSampleContentStream()); // TODO This is test data for content stream
 
-            PDFArray mediaBox = new PDFArray(PDFObject.DirectObject,
-                new PDFReal(0.0), new PDFReal(0.0), new PDFReal(595.2756), new PDFReal(841.8898));
-            PDFArray pageKidsArray = CreateIndirectArray();
+            currentPageDictionary = CreateIndirectDictionary();
+            currentPageDictionary.Put("Type", new PDFName("Page"));
+            currentPageDictionary.Put("Parent", pagesDictionary);
+            currentPageDictionary.Put("Contents", currentContentStream);
+            currentPageDictionary.Put("MediaBox", mediaBox);
+            currentPageDictionary.Put("Resources", currentPageResources);
 
-            PDFDictionary pages = CreateIndirectDictionary();
-            pages.Put("Type", new PDFName("Pages"));
-            pages.Put("Count", new PDFInt(pageCount));
-            pages.Put("Kids", pageKidsArray);
-            pages.Put("Resources", resources);
-
-            PDFStream[] contentStreams = new PDFStream[pageCount];
-            contentStreams[0] = singlePageContentStream; // TODO remove when we have more than 1 page
-
-            for (int i = 0; i < pageCount; i++)
-            {
-                PDFStream stream = singlePageContentStream; // TODO remove when we have more than 1 page
-                //PDFStream stream = CreateContentStream(PDFStream.Filter.None); // TODO use flate
-
-                contentStreams[i] = stream;
-                stream.WriteData(GetSampleContentStream()); // TODO This is test data for content stream
-
-                PDFDictionary page = CreateIndirectDictionary();
-                pageKidsArray.Array.Add(page);
-                page.Put("Type", new PDFName("Page"));
-                page.Put("Parent", pages);
-                page.Put("Contents", stream);
-                page.Put("MediaBox", mediaBox);
-                page.Put("Resources", resources); 
-            }
-
-            PDFDictionary catalog = CreateIndirectDictionary();
-            int objectNumberOfCatalog = catalog.ObjectNumber;
-            catalog.Put("Type", new PDFName("Catalog"));
-            catalog.Put("Pages", pages);
-
-            PDFString fileIdString = PDFString.CreateFileIDString();
-
-            trailerDictionary = new PDFDictionary(PDFObject.DirectObject);
-            trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
-            trailerDictionary.Put("Root", catalog);
-            trailerDictionary.Put("ID", new PDFArray(PDFObject.DirectObject, fileIdString, fileIdString));
+            pageDictionaries.Add(currentPageDictionary);
+            pageKidsArray.Array.Add(currentPageDictionary);            
         }
 
         private string GetSampleContentStream()
@@ -88,42 +96,33 @@ namespace PDFLibrary
                 "  /F1 35 Tf\r\n" +
                 "  50 -500 Td\r\n" +
                 "  (Test string) Tj\r\n" +
-                "ET";
+                "ET\r\n";
         }
 
-        private void WritePDFFile()
+        private void WritePDFFile(string path)
         {
-            string path = "C:\\Users\\jaa\\Documents\\test1.pdf";
             List<long> xref = new List<long>();
 
-            try
+            using (Stream stream = new FileStream(path, FileMode.OpenOrCreate))
             {
-                using (Stream stream = new FileStream(path, FileMode.OpenOrCreate))
+                stream.SetLength(0); // clear previous file contents
+
+                // File header
+                PDFObject.WriteASCIIBytes("%PDF-1.5\r\n", stream);
+                WriteBinaryMarker(stream);
+
+                foreach (PDFObject obj in indirectObjects)
                 {
-                    stream.SetLength(0); // clear previous file content
-
-                    // File header
-                    PDFObject.WriteASCIIBytes("%PDF-1.5\r\n", stream);
-                    WriteBinaryMarker(stream);
-
-                    foreach (PDFObject obj in indirectObjects)
-                    {
-                        xref.Add(stream.Position);
-                        obj.Write(stream);
-                    }
-
-                    long startXref = stream.Position;
-                    WriteXref(xref, stream);
-
-                    PDFObject.WriteASCIIBytes("trailer\r\n", stream);
-                    trailerDictionary.Write(stream);
-                    PDFObject.WriteASCIIBytes($"\r\nstartxref\r\n{startXref}\r\n%%EOF\r\n", stream);
+                    xref.Add(stream.Position);
+                    obj.Write(stream);
                 }
-            }
-            catch (Exception)
-            {
 
-                // TODO
+                long startXref = stream.Position;
+                WriteXref(xref, stream);
+
+                PDFObject.WriteASCIIBytes("trailer\r\n", stream);
+                trailerDictionary.Write(stream);
+                PDFObject.WriteASCIIBytes($"\r\nstartxref\r\n{startXref}\r\n%%EOF\r\n", stream);
             }
         }
 
@@ -180,14 +179,22 @@ namespace PDFLibrary
             return stream;
         }
 
-        public void CreatePDF()
+        /// <summary>
+        /// Finishes PDF creation and writes all PDF objects to the specified file.
+        /// This must be called as the final step when creating a PDF.
+        /// </summary>
+        public void Finish(string path)
         {
-            CreatePDFObjects();
-            WritePDFFile();
+            // Set actual page count
+            pagesDictionary.Put("Count", new PDFInt(pageDictionaries.Count));
+            // Set actual number of objects
+            trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
+
+            WritePDFFile(path);
         }
 
         public void DrawRectangle(double x, double y, double width, double height,
-        PDFColor stroke, PDFColor fill, double lineWidth)
+            PDFColor stroke, PDFColor fill, double lineWidth)
         {
             WriteColor(fill, false);
             WriteColor(stroke, true);
@@ -195,6 +202,42 @@ namespace PDFLibrary
             AppendToContentStream(
                 $"{ PDFReal.RealToString(x) } { PDFReal.RealToString(-y) } { PDFReal.RealToString(width) } { PDFReal.RealToString(-height) } re\r\n");
             WritePaintOp(stroke, fill);
+        }
+
+        public void DrawLine(double x0, double y0, double x1, double y1,
+            PDFColor stroke, double lineWidth)
+        {
+            if (stroke == null)
+            {
+                return;
+            }
+
+            WriteColor(stroke, true);
+            WriteLineWidth(stroke, lineWidth);
+            AppendToContentStream(
+                $"{ PDFReal.RealToString(x0) } { PDFReal.RealToString(-y0) } m\r\n" +
+                $"{ PDFReal.RealToString(x1) } { PDFReal.RealToString(-y1) } l\r\n");
+            AppendToContentStream("S\r\n");
+        }
+
+        public void DrawCurve(double x0, double y0, double x1, double y1, double x2, double y2,
+            double x3, double y3, PDFColor stroke, double lineWidth)
+        {
+            // TODO Fill is not yet supported for curve
+
+            if (stroke == null)
+            {
+                return;
+            }
+
+            WriteColor(stroke, true);
+            WriteLineWidth(stroke, lineWidth);
+            AppendToContentStream(
+                $"{ PDFReal.RealToString(x0) } { PDFReal.RealToString(-y0) } m\r\n" +
+                $"{ PDFReal.RealToString(x1) } { PDFReal.RealToString(-y1) } " +
+                $"{ PDFReal.RealToString(x2) } { PDFReal.RealToString(-y2) } " +
+                $"{ PDFReal.RealToString(x3) } { PDFReal.RealToString(-y3) } c\r\n"); 
+            AppendToContentStream("S\r\n");
         }
 
         private void WriteColor(PDFColor color, bool isStroke)
@@ -231,7 +274,7 @@ namespace PDFLibrary
 
         private void AppendToContentStream(string str)
         {
-            singlePageContentStream.WriteData(str);
+            currentContentStream.WriteData(str);
         }
     }
 }

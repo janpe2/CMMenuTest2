@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace PDFLibrary.Types
 {
@@ -25,7 +26,12 @@ namespace PDFLibrary.Types
         {
             // Decimal separator must be '.'.
             // Exponential notation is not allowed in PDF.
-            return value.ToString("F3", System.Globalization.CultureInfo.InvariantCulture);
+
+            if (value == (int)value)
+            {
+                return value.ToString("F1", CultureInfo.InvariantCulture);
+            }
+            return value.ToString("F3", CultureInfo.InvariantCulture);
         }
     }
 }

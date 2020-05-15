@@ -122,11 +122,20 @@ namespace WpfUI.ViewModels
 
         public void SavePDF()
         {
-            PDFLibrary.PDFCreator pc = new PDFLibrary.PDFCreator();
-            PDFGraphicsContext pgc = new PDFGraphicsContext(pc);
-            pgc.DrawRectangle(0, 0, 595, 842, null, new SolidColorBrush(SelectedBackgroundColor), 1.0);
-            pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
-            pc.CreatePDF();
+            try
+            {
+                PDFLibrary.PDFCreator pc = new PDFLibrary.PDFCreator();
+                PDFGraphicsContext pgc = new PDFGraphicsContext(pc);
+
+                pgc.DrawRectangle(0, 0, 595, 842, null, new SolidColorBrush(SelectedBackgroundColor), 1.0);
+                pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
+
+                pc.Finish("C:\\Users\\jaa\\Documents\\test1.pdf");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to save PDF.\n" + ex, "Error");
+            }
             
         }
     }
