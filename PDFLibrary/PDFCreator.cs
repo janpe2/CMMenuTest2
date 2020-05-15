@@ -21,9 +21,12 @@ namespace PDFLibrary
         private PDFDictionary currentPageResources;
         private PDFArray mediaBox;
         private List<PDFDictionary> resourcesForEachPage = new List<PDFDictionary>();
+        private string pdfFileName;
 
-        public PDFCreator()
+        public PDFCreator(string pdfFileName)
         {
+            this.pdfFileName = pdfFileName;
+
             pageKidsArray = CreateIndirectArray();
             mediaBox = new PDFArray(PDFObject.DirectObject,
                 new PDFReal(0.0), new PDFReal(0.0), new PDFReal(595.2756), new PDFReal(841.8898)); // A4
@@ -39,7 +42,7 @@ namespace PDFLibrary
 
             PDFDictionary infoDictionary = CreateIndirectDictionary();
             infoDictionary.Put("Creator", new PDFString("Menu Master"));
-            //infoDictionary.Put("CreationDate", GetCreationDateString());
+            infoDictionary.Put("CreationDate", PDFString.GetDateString());
 
             PDFString fileIdString = PDFString.CreateFileIDString();
 
@@ -99,11 +102,11 @@ namespace PDFLibrary
                 "ET\r\n";
         }
 
-        private void WritePDFFile(string path)
+        private void WritePDFFile()
         {
             List<long> xref = new List<long>();
 
-            using (Stream stream = new FileStream(path, FileMode.OpenOrCreate))
+            using (Stream stream = new FileStream(pdfFileName, FileMode.OpenOrCreate))
             {
                 stream.SetLength(0); // clear previous file contents
 
@@ -183,14 +186,14 @@ namespace PDFLibrary
         /// Finishes PDF creation and writes all PDF objects to the specified file.
         /// This must be called as the final step when creating a PDF.
         /// </summary>
-        public void Finish(string path)
+        public void Finish()
         {
             // Set actual page count
             pagesDictionary.Put("Count", new PDFInt(pageDictionaries.Count));
             // Set actual number of objects
             trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
 
-            WritePDFFile(path);
+            WritePDFFile();
         }
 
         public void DrawRectangle(double x, double y, double width, double height,
@@ -238,6 +241,19 @@ namespace PDFLibrary
                 $"{ PDFReal.RealToString(x2) } { PDFReal.RealToString(-y2) } " +
                 $"{ PDFReal.RealToString(x3) } { PDFReal.RealToString(-y3) } c\r\n"); 
             AppendToContentStream("S\r\n");
+        }
+
+        public void DrawText(string text, string fontFamily, double fontSize, PDFColor color, 
+            double x, double y)
+        {
+            PDFString str = new PDFString(text);
+            WriteColor(color, false);
+            AppendToContentStream(
+                "BT\r\n" +
+                $"  /F1 {PDFReal.RealToString(fontSize)} Tf\r\n" +
+                $"  {PDFReal.RealToString(x)} {PDFReal.RealToString(y)} Td\r\n" +
+                $"  {str.ToString()} Tj\r\n" +
+                "ET\r\n");
         }
 
         private void WriteColor(PDFColor color, bool isStroke)

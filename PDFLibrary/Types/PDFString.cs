@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace PDFLibrary.Types
@@ -69,6 +70,45 @@ namespace PDFLibrary.Types
             return sb.ToString();
         }
 
+        public override void Write(Stream output)
+        {
+            // This writes binary bytes.
+            
+            output.WriteByte((byte)'(');
+
+            foreach (char ch in Value)
+            {
+                switch (ch)
+                {
+                    case '(':
+                        output.WriteByte((byte)'\\');
+                        output.WriteByte((byte)'(');
+                        break;
+                    case ')':
+                        output.WriteByte((byte)'\\');
+                        output.WriteByte((byte)')');
+                        break;
+                    case '\\':
+                        output.WriteByte((byte)'\\');
+                        output.WriteByte((byte)'\\');
+                        break;
+                    case '\r':
+                        output.WriteByte((byte)'\\');
+                        output.WriteByte((byte)'r');
+                        break;
+                    case '\n':
+                        output.WriteByte((byte)'\\');
+                        output.WriteByte((byte)'n');
+                        break;
+                    default:
+                        output.WriteByte((byte)ch);
+                        break;
+                }
+            }
+
+            output.WriteByte((byte)')');
+        }
+
         public static PDFString CreateFileIDString()
         {
             // Let's create a string of random bytes instead of using the
@@ -85,5 +125,11 @@ namespace PDFLibrary.Types
             return new PDFString(new string(array));
         }
 
+        public static PDFString GetDateString()
+        {
+            string str = DateTime.Now.ToString("yyyyMMddHHmmss", 
+                System.Globalization.CultureInfo.InvariantCulture);
+            return new PDFString("D:" + str);
+        }
     }
 }

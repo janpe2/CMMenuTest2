@@ -9,7 +9,7 @@ namespace PDFLibrary.Types
     {
         public const int DirectObject = -1;
 
-        public virtual bool IsIndirect { get; set; }
+        public virtual bool IsIndirect { get; }
 
         public abstract override string ToString();
 

@@ -23,7 +23,9 @@ namespace WpfUI.MenuLibrary.Graphics
         public void DrawText(string text, Typeface font, double fontSize,
             Brush brush, double x, double y, Boolean horCenterOnPage)
         {
-
+            // TODO Compute centering
+            // TODO Get font family name
+            pdfCreator.DrawText(text, "", fontSize, GetPDFColor(brush), x, y);
         }
 
         public void DrawLine(double x0, double y0, double x1, double y1,

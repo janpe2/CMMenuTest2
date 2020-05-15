@@ -22,6 +22,11 @@ namespace WpfUI.MenuLibrary
             
         }
 
+        public MenuGraphicsCreator(Menu menu)
+        {
+            this.menu = menu;
+        }
+
         public void LoadMenu(int menuId)
         {
             try

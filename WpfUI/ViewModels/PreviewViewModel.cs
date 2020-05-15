@@ -124,13 +124,28 @@ namespace WpfUI.ViewModels
         {
             try
             {
-                PDFLibrary.PDFCreator pc = new PDFLibrary.PDFCreator();
+                Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+                dialog.Filter = "PDF Files (*.pdf)|*.pdf";
+                dialog.Title = "Save PDF";
+                dialog.AddExtension = true;
+                dialog.OverwritePrompt = true;
+                if (dialog.ShowDialog() == false)
+                {
+                    return;
+                }
+
+                MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator(SelectedMenu);
+                PDFLibrary.PDFCreator pc = new PDFLibrary.PDFCreator(dialog.FileName);
                 PDFGraphicsContext pgc = new PDFGraphicsContext(pc);
 
                 pgc.DrawRectangle(0, 0, 595, 842, null, new SolidColorBrush(SelectedBackgroundColor), 1.0);
-                pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
+                //pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
 
-                pc.Finish("C:\\Users\\jaa\\Documents\\test1.pdf");
+                graphicsCreator.Start(pgc, SelectedColor, null);
+                graphicsCreator.DrawMenu(ShowBorderSelected, ShowOrnamentsSelected);
+                graphicsCreator.End();
+
+                pc.Finish();
             }
             catch (Exception ex)
             {

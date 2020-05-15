@@ -16,7 +16,7 @@ namespace PDFLibrary.Types
         public int ObjectNumber { get; }
         public override bool IsIndirect
         {
-            get { return ObjectNumber > -1; }
+            get { return ObjectNumber > DirectObject; }
         }
 
         public PDFDictionary(int objNum)
