@@ -5,7 +5,7 @@ using System.Text;
 namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type <c>integer</c>.
+    /// PDF object type <c>integer</c>.
     /// </summary>
     public class PDFInt : PDFObject
     {

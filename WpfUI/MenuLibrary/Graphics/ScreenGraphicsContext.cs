@@ -14,7 +14,7 @@ namespace WpfUI.MenuLibrary.Graphics
     public class ScreenGraphicsContext : IGraphicsContext
     {
         private DrawingContext dc;
-        private System.Globalization.CultureInfo cultureInfo = new System.Globalization.CultureInfo("en-US");
+        private System.Globalization.CultureInfo cultureInfo = System.Globalization.CultureInfo.InvariantCulture;
 
         public ScreenGraphicsContext(DrawingContext dc)
         {
@@ -22,13 +22,13 @@ namespace WpfUI.MenuLibrary.Graphics
         }
 
         public void DrawText(string text, Typeface font, double fontSize,
-            Brush brush, double x, double y, Boolean horizontallyCenterOnPage)
+            Brush brush, double x, double y, bool horCenterOnPage)
         {
             var formattedText = new FormattedText(text,
                     cultureInfo, FlowDirection.LeftToRight, font, fontSize, brush, 1.0);
-            if (horizontallyCenterOnPage)
+            if (horCenterOnPage)
             {
-                x = (MenuGraphicsCreator.PAGE_WIDTH - formattedText.Width) / 2;
+                x = (MenuGraphicsCreator.PageWidth - formattedText.Width) / 2;
             }
             dc.DrawText(formattedText, new Point(x, y));
         }

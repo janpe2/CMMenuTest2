@@ -11,8 +11,6 @@ namespace WpfUI.ViewModels
 {
     public class CategoryViewModel : Screen
     {
-        //public MenuManager TheMenuManager { get; set; }
-
         public BindableCollection<Dish> DishesInCategory { get; } = new BindableCollection<Dish>();
 
         public List<string> CategoryNames { get; set; }
@@ -121,13 +119,10 @@ namespace WpfUI.ViewModels
         /// Constructor.
         /// </summary>
         /// <param name="manager">menu manager</param>
-        public CategoryViewModel(MenuManager manager)
+        public CategoryViewModel()
         {
             DataAccess da = new DataAccess();
             List<Menu> allMenus = da.GetAllMenus();
-
-            //TheMenuManager = manager;
-
             SelectedMenu = allMenus[0];
 
             CategoryNames = new List<string>();
@@ -196,8 +191,6 @@ namespace WpfUI.ViewModels
             da.AddMenu(menu);
             menu.Id = GetMaxMenuIdFromDB(da);
 
-            //TheMenuManager.AllMenus.Add(menu);
-
             Menus.Add(menu);
             NotifyOfPropertyChange(() => Menus);
             SelectedMenu = menu;
@@ -225,7 +218,7 @@ namespace WpfUI.ViewModels
 
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                //int index = TheMenuManager.AllMenus.IndexOf(SelectedMenu);
+                //int index = AllMenus.IndexOf(SelectedMenu);
                 int index = GetIndexOfMenuById(SelectedMenu.Id);
                 Menu newSelection;
 

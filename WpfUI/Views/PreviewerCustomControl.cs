@@ -177,8 +177,8 @@ namespace WpfUI.Views
 
             double width = ActualWidth;
             double height = ActualHeight;
-            double pageWidth = MenuGraphicsCreator.PAGE_WIDTH;
-            double pageHeight = MenuGraphicsCreator.PAGE_HEIGHT;
+            double pageWidth = MenuGraphicsCreator.PageWidth;
+            double pageHeight = MenuGraphicsCreator.PageHeight;
             double scaleX = width / pageWidth;
             double scaleY = height / pageHeight;
             double scale = Math.Min(scaleX, scaleY);

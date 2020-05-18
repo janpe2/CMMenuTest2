@@ -6,7 +6,7 @@ using System.Text;
 namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type <c>dictionary</c>.
+    /// PDF object type <c>dictionary</c>.
     /// For efficiency and simplicity, keys are strings instead of PDFName objects.
     /// Keys must be interpreted as ASCII text.
     /// </summary>

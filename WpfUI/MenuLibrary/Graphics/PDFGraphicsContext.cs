@@ -15,17 +15,31 @@ namespace WpfUI.MenuLibrary.Graphics
         private PDFCreator pdfCreator;
 
 
-        public PDFGraphicsContext(PDFCreator pc)
+        public PDFGraphicsContext(string filePath)
         {
-            pdfCreator = pc;
+            pdfCreator = new PDFCreator(filePath);
+        }
+
+        public void Finish()
+        {
+            pdfCreator.Finish();
         }
 
         public void DrawText(string text, Typeface font, double fontSize,
-            Brush brush, double x, double y, Boolean horCenterOnPage)
+            Brush brush, double x, double y, bool horCenterOnPage)
         {
-            // TODO Compute centering
-            // TODO Get font family name
-            pdfCreator.DrawText(text, "", fontSize, GetPDFColor(brush), x, y);
+            if (horCenterOnPage)
+            {
+                var formattedText = new FormattedText(text,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Windows.FlowDirection.LeftToRight, font, fontSize, brush, 1.0);
+                x = (MenuGraphicsCreator.PageWidth - formattedText.Width) / 2;
+            }
+
+            y += fontSize * font.FontFamily.Baseline;
+
+            string fontFamily = ""; // TODO Get font family name
+            pdfCreator.DrawText(text, fontFamily, fontSize, GetPDFColor(brush), x, y);
         }
 
         public void DrawLine(double x0, double y0, double x1, double y1,

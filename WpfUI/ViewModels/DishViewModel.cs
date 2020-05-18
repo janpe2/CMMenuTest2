@@ -11,8 +11,6 @@ namespace WpfUI.ViewModels
 {
     public class DishViewModel : Screen
     {
-        //public MenuManager TheMenuManager { get; set; }
-
         private BindableCollection<Dish> _dishes = new BindableCollection<Dish>();
         public BindableCollection<Dish> Dishes 
         { 
@@ -225,15 +223,12 @@ namespace WpfUI.ViewModels
             get { return !SelectedDishModified; }
         }
 
-        public DishViewModel(MenuManager m)
+        public DishViewModel()
         {
-            //TheMenuManager = m;
-
             DataAccess da = new DataAccess();
             List<Dish> allDishes = da.GetAllDishes();
             _dishes.AddRange(TrimNames(allDishes));
-
-            if (m.AllDishes.Count > 0)
+            if (_dishes.Count > 0)
             {
                 SelectedDish = _dishes[0];
             }
@@ -302,9 +297,6 @@ namespace WpfUI.ViewModels
             int id = da.InsertDish(dish);
             dish.Id = id; // GetMaxIdFromDB(da); // get the Id of the Dish we just added to the database
             Dishes.Add(dish);
-            //TheMenuManager.AllDishes.Add(dish);
-
-
 
             SelectedDish = dish;
             SelectedDishModified = false;
@@ -411,8 +403,6 @@ namespace WpfUI.ViewModels
 
                 DataAccess da = new DataAccess();
                 da.DeleteDish(SelectedDish);
-
-                //TheMenuManager.AllDishes.RemoveAt(index);
                 Dishes.RemoveAt(index);
 
                 SelectedDish = newSelection;

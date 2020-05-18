@@ -10,6 +10,7 @@ using WpfUI.MenuLibrary;
 using WpfUI.MenuLibrary.DataAccess;
 using WpfUI.MenuLibrary.Graphics;
 using Color = System.Windows.Media.Color;
+using WpfUI.Models;
 
 namespace WpfUI.ViewModels
 {
@@ -135,8 +136,8 @@ namespace WpfUI.ViewModels
                 }
 
                 MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator(SelectedMenu);
-                PDFLibrary.PDFCreator pc = new PDFLibrary.PDFCreator(dialog.FileName);
-                PDFGraphicsContext pgc = new PDFGraphicsContext(pc);
+                graphicsCreator.LoadMenu(SelectedMenuId);
+                PDFGraphicsContext pgc = new PDFGraphicsContext(dialog.FileName);
 
                 pgc.DrawRectangle(0, 0, 595, 842, null, new SolidColorBrush(SelectedBackgroundColor), 1.0);
                 //pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
@@ -145,7 +146,7 @@ namespace WpfUI.ViewModels
                 graphicsCreator.DrawMenu(ShowBorderSelected, ShowOrnamentsSelected);
                 graphicsCreator.End();
 
-                pc.Finish();
+                pgc.Finish();
             }
             catch (Exception ex)
             {

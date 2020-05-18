@@ -24,8 +24,8 @@
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,7">
             <TextBlock Text="Menu:" Margin="0,0,7,3" VerticalAlignment="Center"/>
 
-            <ComboBox Name="Menus" DisplayMemberPath="Name"  
-                      SelectedItem="{Binding SelectedMenu}" VerticalAlignment="Center"/>
+            <ComboBox Name="Menus" DisplayMemberPath="Name" VerticalAlignment="Center"
+                      SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"/>
 
             <TextBlock Text="Color:" Margin="5,0,7,3" VerticalAlignment="Center"/>
 

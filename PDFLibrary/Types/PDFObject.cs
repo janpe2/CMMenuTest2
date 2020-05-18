@@ -5,6 +5,9 @@ using System.IO;
 
 namespace PDFLibrary.Types
 {
+    /// <summary>
+    /// Base class for all PDF object types.
+    /// </summary>
     public abstract class PDFObject
     {
         public const int DirectObject = -1;
@@ -31,7 +34,7 @@ namespace PDFLibrary.Types
         /// <returns>R syntax string</returns>
         public virtual string ToReferenceString()
         {
-            return "";
+            return ToString();
         }
     }
 

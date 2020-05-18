@@ -5,65 +5,51 @@ using System.Text;
 using System.Windows;
 using WpfUI.MenuLibrary;
 using WpfUI.MenuLibrary.DataAccess;
-using WpfUI.Models;
+
 
 namespace WpfUI.ViewModels
 {
     public class ShellViewModel : Conductor<object>
     {
-        private MenuManager menuManager = new MenuManager();
-
         public ShellViewModel()
         {
-            menuManager.LoadSampleData();
             ShowDishes();
         }
 
         public void ShowDishes()
         {
-            DishViewModel dvm = new DishViewModel(menuManager);
-            ActivateItemAsync(dvm, System.Threading.CancellationToken.None);
+            try
+            {
+                DishViewModel dvm = new DishViewModel();
+                ActivateItemAsync(dvm, System.Threading.CancellationToken.None);
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public void ShowMenus()
         {
-            CategoryViewModel cvm = new CategoryViewModel(menuManager);
-            ActivateItemAsync(cvm, System.Threading.CancellationToken.None);
+            try
+            {
+                CategoryViewModel cvm = new CategoryViewModel();
+                ActivateItemAsync(cvm, System.Threading.CancellationToken.None);
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public void ShowPreview()
         {
-            PreviewViewModel vm = new PreviewViewModel();
-            ActivateItemAsync(vm, System.Threading.CancellationToken.None);
-        }
-
-        public void TestSQL()
-        {
-            /*
-            DataAccess db = new DataAccess();
-            
-            Dish dish = db.GetDish("Fish soup");
-            if (dish == null)
+            try
             {
-                MessageBox.Show("No dish");
+                PreviewViewModel vm = new PreviewViewModel();
+                ActivateItemAsync(vm, System.Threading.CancellationToken.None);
             }
-            else
+            catch (Exception)
             {
-                MessageBox.Show($"{dish.Name} {dish.Description} {dish.Price}");
             }
-
-
-            string newName = $"New dish {new Random().Next(0, 5000)}";
-            db.InsertDish(newName, "Something new food", 8.45);
-
-            List<Dish> dishes = db.GetAllDishes();
-            StringBuilder sb = new StringBuilder();
-            foreach (var item in dishes)
-            {
-                sb.Append(item.Name.Trim()).Append(" -- ").Append(item.Description.Trim()).Append('\n');
-            }
-            MessageBox.Show(sb.ToString());
-            */
         }
 
         public void ExitApplication()

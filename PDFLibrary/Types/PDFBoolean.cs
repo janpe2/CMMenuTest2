@@ -5,13 +5,17 @@ using System.Text;
 namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type <c>boolean</c>.
+    /// PDF object type <c>boolean</c>.
     /// </summary>
     public class PDFBoolean : PDFObject
     {
+        public static PDFBoolean FalseInstance { get; } = new PDFBoolean(false);
+
+        public static PDFBoolean TrueInstance { get; } = new PDFBoolean(true);
+
         public bool Value { get; }
 
-        public PDFBoolean(bool value)
+        private PDFBoolean(bool value)
         {
             this.Value = value;
         }

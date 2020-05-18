@@ -75,7 +75,6 @@ namespace PDFLibrary
 
             currentContentStream = CreateContentStream(PDFStream.Filter.None);
             pageContentStreams.Add(currentContentStream);
-            currentContentStream.WriteData(GetSampleContentStream()); // TODO This is test data for content stream
 
             currentPageDictionary = CreateIndirectDictionary();
             currentPageDictionary.Put("Type", new PDFName("Page"));
@@ -88,23 +87,9 @@ namespace PDFLibrary
             pageKidsArray.Array.Add(currentPageDictionary);            
         }
 
-        private string GetSampleContentStream()
-        {
-            return
-                "0 0.60 0 RG\r\n" +
-                "1 w\r\n" +
-                "100 -200 300 100 re S\r\n" +
-                "0 0 1 rg\r\n" +
-                "BT\r\n" +
-                "  /F1 35 Tf\r\n" +
-                "  50 -500 Td\r\n" +
-                "  (Test string) Tj\r\n" +
-                "ET\r\n";
-        }
-
         private void WritePDFFile()
         {
-            List<long> xref = new List<long>();
+            long[] xref = new long[indirectObjects.Count];
 
             using (Stream stream = new FileStream(pdfFileName, FileMode.OpenOrCreate))
             {
@@ -113,10 +98,11 @@ namespace PDFLibrary
                 // File header
                 PDFObject.WriteASCIIBytes("%PDF-1.5\r\n", stream);
                 WriteBinaryMarker(stream);
+                int i = 0;
 
                 foreach (PDFObject obj in indirectObjects)
                 {
-                    xref.Add(stream.Position);
+                    xref[i++] = stream.Position;
                     obj.Write(stream);
                 }
 
@@ -140,7 +126,7 @@ namespace PDFLibrary
             stream.Write(binMarker, 0, binMarker.Length);
         }
 
-        private void WriteXref(List<long> xref, Stream stream)
+        private void WriteXref(long[] xref, Stream stream)
         {
             PDFObject.WriteASCIIBytes(
                 $"xref\r\n0 {indirectObjects.Count + 1}\r\n0000000000 65535 f\r\n", stream);
@@ -246,12 +232,13 @@ namespace PDFLibrary
         public void DrawText(string text, string fontFamily, double fontSize, PDFColor color, 
             double x, double y)
         {
+            // Let's create a temporary PDFString, which takes care of escaping special characters.
             PDFString str = new PDFString(text);
             WriteColor(color, false);
             AppendToContentStream(
                 "BT\r\n" +
                 $"  /F1 {PDFReal.RealToString(fontSize)} Tf\r\n" +
-                $"  {PDFReal.RealToString(x)} {PDFReal.RealToString(y)} Td\r\n" +
+                $"  {PDFReal.RealToString(x)} {PDFReal.RealToString(-y)} Td\r\n" +
                 $"  {str.ToString()} Tj\r\n" +
                 "ET\r\n");
         }

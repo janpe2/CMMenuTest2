@@ -7,7 +7,7 @@ using System.IO.Compression;
 namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type <c>stream</c>.
+    /// PDF object type <c>stream</c>.
     /// This is always an indirect object.
     /// </summary>
     public class PDFStream : PDFObject

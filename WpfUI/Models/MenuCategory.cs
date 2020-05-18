@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WpfUI.MenuLibrary
+namespace WpfUI.Models
 {
     public class MenuCategory
     {

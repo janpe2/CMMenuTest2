@@ -6,7 +6,7 @@ using System.Globalization;
 namespace PDFLibrary.Types
 {
     /// <summary>
-    /// PDF data type <c>real</c> number.
+    /// PDF object type <c>real</c> number.
     /// </summary>
     public class PDFReal : PDFObject
     {

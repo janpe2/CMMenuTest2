@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
+using WpfUI.Models;
 
-namespace WpfUI.MenuLibrary
+namespace WpfUI.MenuLibrary.Graphics
 {
     public class MenuGraphicsCreator
     {
-        public const double PAGE_WIDTH = 595;
-        public const double PAGE_HEIGHT = 842;
+        public const double PageWidth = 595;
+        public const double PageHeight = 842;
 
         private IGraphicsContext gc;
         private Menu menu;
@@ -32,7 +33,7 @@ namespace WpfUI.MenuLibrary
             try
             {
                 DataAccess.DataAccess da = new DataAccess.DataAccess();
-                menu = da.GetMenuById(menuId);
+                menu = da.GetMenuById(menuId); 
                 dishes = da.GetAllDishesInAllCategories(menuId);
             }
             catch (Exception)
@@ -57,7 +58,7 @@ namespace WpfUI.MenuLibrary
         {
             if (pageBackground != null)
             {
-                gc.DrawRectangle(20, 20, PAGE_WIDTH, PAGE_HEIGHT, pageBackground, Brushes.Transparent, 4.0);
+                gc.DrawRectangle(20, 20, PageWidth, PageHeight, pageBackground, Brushes.Transparent, 4.0);
             }
 
             FontFamily fontFamily = new FontFamily("Times New Roman");
@@ -74,8 +75,8 @@ namespace WpfUI.MenuLibrary
 
             if (showBorder)
             {
-                gc.DrawRectangle(20, 20, PAGE_WIDTH - 40, PAGE_HEIGHT - 40, themeColorBrush, Brushes.Transparent, 4.0);
-                gc.DrawRectangle(30, 30, PAGE_WIDTH - 60, PAGE_HEIGHT - 60, themeColorBrush, Brushes.Transparent, 1.0);
+                gc.DrawRectangle(20, 20, PageWidth - 40, PageHeight - 40, themeColorBrush, Brushes.Transparent, 4.0);
+                gc.DrawRectangle(30, 30, PageWidth - 60, PageHeight - 60, themeColorBrush, Brushes.Transparent, 1.0);
             }
             if (showOrnaments)
             {
@@ -102,7 +103,7 @@ namespace WpfUI.MenuLibrary
                         y += 5;
                         foreach (Dish dish in dishesInCategory)
                         {
-                            gc.DrawText($"{dish.Name} {dish.Price} €", dishNameFont, 14.0, Brushes.Black, 75.0, y, false);
+                            gc.DrawText($"{dish.Name} {dish.Price}", dishNameFont, 14.0, Brushes.Black, 75.0, y, false);
                             y += 16;
                             gc.DrawText(dish.Description, descrFont, 12.0, Brushes.Gray, 75.0, y, false);
                             y += 17; 

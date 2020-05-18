@@ -5,6 +5,7 @@ using System.Text;
 using Dapper;
 using System.Data;
 using System.Data.SqlClient;
+using WpfUI.Models;
 
 namespace WpfUI.MenuLibrary.DataAccess
 {
