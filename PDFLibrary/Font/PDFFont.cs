@@ -9,6 +9,6 @@ namespace PDFLibrary.Font
     {
         public abstract void AddCharacterToSubset(char ch);
 
-        public abstract void Write(Stream stream);
+        public abstract void Write(Stream stream, PDFCreator creator);
     }
 }

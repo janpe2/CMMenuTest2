@@ -17,8 +17,10 @@ namespace PDFLibrary.Types
         {
             get { return true; }
         }
+
+        internal PDFDictionary StreamDictionary { get; } = new PDFDictionary(0);
+
         public MemoryStream Data { get; } = new MemoryStream(1000);
-        private PDFDictionary streamDictionary = new PDFDictionary(0);
         private Filter filter;
 
         public enum Filter
@@ -74,13 +76,13 @@ namespace PDFLibrary.Types
                     throw new Exception("Invalid stream filter");
             }
 
-            streamDictionary.Put("Length", new PDFInt((int)streamData.Length));
+            StreamDictionary.Put("Length", new PDFInt((int)streamData.Length));
             if (filterName != null)
             {
-                streamDictionary.Put("Filter", new PDFName(filterName));
+                StreamDictionary.Put("Filter", new PDFName(filterName));
             }
 
-            WriteASCIIBytes($"{ObjectNumber} 0 obj\r\n{streamDictionary.ToString()}\r\nstream\r\n", output);
+            WriteASCIIBytes($"{ObjectNumber} 0 obj\r\n{StreamDictionary.ToString()}\r\nstream\r\n", output);
             streamData.WriteTo(output);
             WriteASCIIBytes("\r\nendstream\r\nendobj\r\n\r\n", output);
         }

@@ -138,7 +138,7 @@ namespace PDFLibrary
             }
         }
 
-        private int GetNextObjectNumber()
+        internal int GetNextObjectNumber()
         {
             return objectNumberCounter++;
         }
