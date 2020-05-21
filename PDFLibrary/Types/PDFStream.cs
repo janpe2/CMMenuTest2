@@ -58,25 +58,32 @@ namespace PDFLibrary.Types
         {
             MemoryStream streamData;
             string filterName;
+            int length;
+
             switch (filter)
             {
                 case Filter.Flate:
+                    /*
+                    // TODO Flate compression does not work yet
                     streamData = new MemoryStream(1000);
                     filterName = "FlateDecode";
                     using (Stream deflateStream = new DeflateStream(streamData, CompressionMode.Compress))
                     {
                         Data.WriteTo(deflateStream);
+                        length = (int)streamData.Length; // get length before streamData is closed
                     }
                     break;
+                    */
                 case Filter.None:
                     streamData = Data;
                     filterName = null;
+                    length = (int)Data.Length;
                     break;
                 default:
                     throw new Exception("Invalid stream filter");
             }
 
-            StreamDictionary.Put("Length", new PDFInt((int)streamData.Length));
+            StreamDictionary.Put("Length", new PDFInt(length));
             if (filterName != null)
             {
                 StreamDictionary.Put("Filter", new PDFName(filterName));

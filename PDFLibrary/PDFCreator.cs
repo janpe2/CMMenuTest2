@@ -1,4 +1,5 @@
-﻿using PDFLibrary.Types;
+﻿using PDFLibrary.Font;
+using PDFLibrary.Types;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -22,14 +23,17 @@ namespace PDFLibrary
         private PDFArray mediaBox;
         private List<PDFDictionary> resourcesForEachPage = new List<PDFDictionary>();
         private string pdfFileName;
+        private PDFFont testfont; // TODO for font testing, remove
 
         public PDFCreator(string pdfFileName)
         {
             this.pdfFileName = pdfFileName;
 
+            testfont = new PDFTrueTypeFont(CreateIndirectDictionary());
+
             pageKidsArray = CreateIndirectArray();
             mediaBox = new PDFArray(PDFObject.DirectObject,
-                new PDFReal(0.0), new PDFReal(0.0), new PDFReal(595.2756), new PDFReal(841.8898)); // A4
+                0.0, 0.0, 595.2756, 841.8898); // A4
 
             pagesDictionary = CreateIndirectDictionary();
             pagesDictionary.Put("Type", new PDFName("Pages"));
@@ -56,21 +60,23 @@ namespace PDFLibrary
         }
 
         /// <summary>
-        /// Adds a new page to PDF and creates the needed PDF objects.
+        /// Adds a new page to the PDF and creates the needed PDF objects.
         /// </summary>
         public void AddPage()
         {
             currentPageResources = CreateIndirectDictionary();
             resourcesForEachPage.Add(currentPageResources);
 
-            PDFDictionary testFont = CreateIndirectDictionary();
-            testFont.Put("Type", new PDFName("Font"));
-            testFont.Put("Subtype", new PDFName("Type1"));
-            testFont.Put("BaseFont", new PDFName("Times-Roman"));
-            testFont.Put("Encoding", new PDFName("WinAnsiEncoding"));
+            PDFDictionary testFontRes = testfont.GetFontDictionary(); // CreateIndirectDictionary();
+            /*
+            testFontRes.Put("Type", new PDFName("Font"));
+            testFontRes.Put("Subtype", new PDFName("Type1"));
+            testFontRes.Put("BaseFont", new PDFName("Times-Roman"));
+            testFontRes.Put("Encoding", new PDFName("WinAnsiEncoding"));
+            */
             
             PDFDictionary fontResources = CreateIndirectDictionary();
-            fontResources.Put("F1", testFont);
+            fontResources.Put("F1", testFontRes);
             currentPageResources.Put("Font", fontResources);
 
             currentContentStream = CreateContentStream(PDFStream.Filter.None);
@@ -138,29 +144,49 @@ namespace PDFLibrary
             }
         }
 
-        internal int GetNextObjectNumber()
+        private int GetNextObjectNumber()
         {
             return objectNumberCounter++;
         }
 
-        private PDFDictionary CreateIndirectDictionary()
+        internal PDFDictionary CreateIndirectDictionary()
         {
             PDFDictionary dict = new PDFDictionary(GetNextObjectNumber());
             indirectObjects.Add(dict);
             return dict;
         }
 
-        private PDFArray CreateIndirectArray()
+        internal PDFArray CreateIndirectArray()
         {
             PDFArray array = new PDFArray(GetNextObjectNumber());
             indirectObjects.Add(array);
             return array;
         }
 
-        private PDFStream CreateContentStream(PDFStream.Filter filter)
+        internal PDFArray CreateIndirectArray(params double[] realValues)
+        {
+            PDFArray array = new PDFArray(GetNextObjectNumber(), realValues);
+            indirectObjects.Add(array);
+            return array;
+        }
+
+        internal PDFArray CreateIndirectArray(params int[] intValues)
+        {
+            PDFArray array = new PDFArray(GetNextObjectNumber(), intValues);
+            indirectObjects.Add(array);
+            return array;
+        }
+
+        internal PDFStream CreateStream(PDFStream.Filter filter)
         {
             PDFStream stream = new PDFStream(GetNextObjectNumber(), filter);
             indirectObjects.Add(stream);
+            return stream;
+        }
+
+        private PDFStream CreateContentStream(PDFStream.Filter filter)
+        {
+            PDFStream stream = CreateStream(filter);
 
             // Each page needs this translate
             stream.WriteData("1 0 0 1 0 841.8898 cm\r\n");
@@ -178,6 +204,8 @@ namespace PDFLibrary
             pagesDictionary.Put("Count", new PDFInt(pageDictionaries.Count));
             // Set actual number of objects
             trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
+
+            testfont.Create(this);
 
             WritePDFFile();
         }
@@ -232,6 +260,8 @@ namespace PDFLibrary
         public void DrawText(string text, string fontFamily, double fontSize, PDFColor color, 
             double x, double y)
         {
+            testfont.AddStringToSubset(text);
+
             // Let's create a temporary PDFString, which takes care of escaping special characters.
             PDFString str = new PDFString(text);
             WriteColor(color, false);

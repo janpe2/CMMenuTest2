@@ -22,10 +22,28 @@ namespace PDFLibrary.Types
             ObjectNumber = objNum;
         }
 
-        public PDFArray(int obj, params PDFObject[] elements)
+        public PDFArray(int objNum, params PDFObject[] elements)
         {
-            this.ObjectNumber = obj;
+            this.ObjectNumber = objNum;
             this.Array.AddRange(elements);
+        }
+
+        public PDFArray(int objNum, params double[] realValues)
+        {
+            ObjectNumber = objNum;
+            foreach (double value in realValues)
+            {
+                Array.Add(new PDFReal(value));
+            }
+        }
+
+        public PDFArray(int objNum, params int[] intValues)
+        {
+            ObjectNumber = objNum;
+            foreach (int value in intValues)
+            {
+                Array.Add(new PDFInt(value));
+            }
         }
 
         public override string ToString()

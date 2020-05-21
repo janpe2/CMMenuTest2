@@ -12,7 +12,7 @@ namespace PDFLibrary.Types
     /// </summary>
     public class PDFDictionary : PDFObject
     {
-        public Dictionary<string, PDFObject> Entries { get; } = new Dictionary<string, PDFObject>();
+        private Dictionary<string, PDFObject> Entries { get; } = new Dictionary<string, PDFObject>();
         public int ObjectNumber { get; }
         public override bool IsIndirect
         {
@@ -26,6 +26,10 @@ namespace PDFLibrary.Types
 
         public void Put(string key, PDFObject value)
         {
+            if (value == null)
+            {
+                throw new Exception($"Value is null for dictionary key '{key}'");
+            }
             // Overwrite the old value if the key already exists.
             // Don't use Add(key, value). It will throw if the key exists.
             Entries[key] = value;
