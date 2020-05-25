@@ -10,19 +10,19 @@ namespace PDFLibrary.Font
 {
     public class PDFTrueTypeFont : PDFFont
     {
-        private Typeface typeface;
+        private Typeface _typeface;
 
         public PDFTrueTypeFont(PDFDictionary fontDictionary, Typeface typeface) :
             base(fontDictionary)
         {
-            this.typeface = typeface;
+            this._typeface = typeface;
         }
 
         public PDFTrueTypeFont(PDFDictionary fontDictionary, FontFamily fontFamily, 
             FontStyle style, FontWeight weight, FontStretch stretch) :
             base(fontDictionary)
         {
-            this.typeface = new Typeface(fontFamily, style, weight, stretch);
+            this._typeface = new Typeface(fontFamily, style, weight, stretch);
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace PDFLibrary.Font
             base(fontDictionary)
         {
             FontFamily fontFamily = new FontFamily("Segoe Print");
-            this.typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            this._typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
         }
 
         private void CheckEmbeddingRights(GlyphTypeface glyphTypeface)
@@ -54,46 +54,30 @@ namespace PDFLibrary.Font
                 case FontEmbeddingRight.PreviewAndPrintButNoSubsetting:
                 case FontEmbeddingRight.PreviewAndPrintButWithBitmapsOnly:
                 case FontEmbeddingRight.PreviewAndPrintButNoSubsettingAndWithBitmapsOnly:
-                    throw new Exception($"Font {typeface.FontFamily.Source} does not allow embedding");
+                    throw new Exception($"Font {_typeface.FontFamily.Source} does not allow embedding");
             }
         }
 
         private GlyphTypeface CreateGlyphTypeface()
         {
             GlyphTypeface glyphTypeface = null;
-            bool ok = typeface.TryGetGlyphTypeface(out glyphTypeface);
+            bool ok = _typeface.TryGetGlyphTypeface(out glyphTypeface);
             if (!ok)
             {
-                throw new Exception($"Failed to get GlyphTypeface for font {typeface.FontFamily.Source}");
+                throw new Exception($"Failed to get GlyphTypeface for font {_typeface.FontFamily.Source}");
             }
             return glyphTypeface;
         }
 
-        private PDFName CreatePostScriptFontName()
-        {
-            // Add a random prefix like "FRDVGH+" which indicates this font is a subset.
-
-            char[] chars = new char[7];
-            Random random = new Random();
-
-            for (int i = 0; i < 6; i++)
-            {
-                chars[i] = (char)random.Next('A', 'Z');
-            }
-            chars[6] = '+';
-
-            return PDFName.GetEscapedName(new string(chars) + typeface.FontFamily.Source);
-        }
-
-        public override void Create(PDFCreator creator)
+        public override void Create(IIndirectObjectCreator creator)
         {
             if (firstChar > lastChar)
             {
                 firstChar = lastChar = 0;
             }
 
-            PDFName postScriptFontName = CreatePostScriptFontName();
-            FontStyle style = typeface.Style;
+            PDFName postScriptFontName = CreatePostScriptFontName(_typeface);
+            FontStyle style = _typeface.Style;
             double italicAngle =
                 (style == FontStyles.Italic || style == FontStyles.Oblique) ? -12.0 : 0.0; // TODO just a guess
 
@@ -136,7 +120,7 @@ namespace PDFLibrary.Font
             fontStream.Write(stream);
         }
 
-        private PDFObject GetWidths(GlyphTypeface glyphTypeface, PDFCreator creator, 
+        private PDFObject GetWidths(GlyphTypeface glyphTypeface, IIndirectObjectCreator creator, 
             IDictionary<int, ushort> cmap)
         {
             PDFArray widths = creator.CreateIndirectArray();
@@ -216,9 +200,10 @@ namespace PDFLibrary.Font
             }
         }
 
-        private PDFArray GetFontBBox(GlyphTypeface glyphTypeface, PDFCreator creator)
+        private PDFArray GetFontBBox(GlyphTypeface glyphTypeface, IIndirectObjectCreator creator)
         {
             // We must parse the 'head' table of the font file to get FontBBox.
+            // The result is actually the FontBBox of the whole font, not that of the subset font.
 
             using (Stream stream = glyphTypeface.GetFontStream())
             {
@@ -264,7 +249,7 @@ namespace PDFLibrary.Font
                 int right = ReadInt16(stream);
                 int top = ReadInt16(stream);
 
-                PDFArray fontBBox = creator.CreateIndirectArray();
+                PDFArray fontBBox = new PDFArray(PDFObject.DirectObject);
                 fontBBox.Array.Add(new PDFInt((int)Math.Floor(1000.0 * left / unitsPerEm)));
                 fontBBox.Array.Add(new PDFInt((int)Math.Floor(1000.0 * bottom / unitsPerEm)));
                 fontBBox.Array.Add(new PDFInt((int)Math.Ceiling(1000.0 * right / unitsPerEm)));

@@ -36,10 +36,10 @@ namespace WpfUI.MenuLibrary.Graphics
                 x = (MenuGraphicsCreator.PageWidth - formattedText.Width) / 2;
             }
 
+            // Change y coordinate from character cell top to baseline.
             y += fontSize * font.FontFamily.Baseline;
 
-            string fontFamily = ""; // TODO Get font family name
-            pdfCreator.DrawText(text, fontFamily, fontSize, GetPDFColor(brush), x, y);
+            pdfCreator.DrawText(text, font, fontSize, GetPDFColor(brush), x, y);
         }
 
         public void DrawLine(double x0, double y0, double x1, double y1,

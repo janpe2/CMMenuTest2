@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Windows;
+using System.Windows.Media;
 
 namespace PDFLibrary.Font
 {
@@ -47,8 +49,36 @@ namespace PDFLibrary.Font
             return fontDictionary;
         }
 
-        public abstract void Create(PDFCreator creator);
+        public abstract void Create(IIndirectObjectCreator creator);
 
         public abstract void Write(Stream stream);
+
+        protected static PDFName CreatePostScriptFontName(Typeface typeface)
+        {
+            string name = typeface.FontFamily.Source.Replace(" ", "");
+            FontStyle style = typeface.Style;
+            FontWeight weight = typeface.Weight;
+
+            if (style != FontStyles.Normal || weight != FontWeights.Normal)
+            {
+                string styleString = (style == FontStyles.Normal) ? "" : style.ToString();
+                string weightString = (weight == FontWeights.Normal) ? "" : weight.ToString();
+                name = $"{name}-{weightString}{styleString}";
+            }
+
+            // Add a random prefix of uppercase letters, like "FRDVGH+", which indicates this font is a subset.
+            char[] chars = new char[7];
+            Random random = new Random();
+            for (int i = 0; i < 6; i++)
+            {
+                chars[i] = (char)random.Next('A', 'Z');
+            }
+            chars[6] = '+';
+
+            return PDFName.GetEscapedName(new string(chars) + name);
+        }
+
+        internal int ResourceKeyId { get; set; }
+
     }
 }

@@ -89,6 +89,14 @@ namespace WpfUI.Views
                     FrameworkPropertyMetadataOptions.AffectsRender)
                 );
 
+        public static readonly DependencyProperty MenuFontFamilyProperty =
+            DependencyProperty.Register(
+                "MenuFontFamily", typeof(FontFamily), typeof(PreviewerCustomControl),
+                new FrameworkPropertyMetadata(
+                    default(FontFamily),
+                    FrameworkPropertyMetadataOptions.AffectsRender)
+                );
+
         public int MenuId
         {
             get 
@@ -149,6 +157,18 @@ namespace WpfUI.Views
             }
         }
 
+        public FontFamily MenuFontFamily
+        {
+            get
+            {
+                return (FontFamily)GetValue(MenuFontFamilyProperty);
+            }
+            set
+            {
+                SetValue(MenuFontFamilyProperty, value);
+            }
+        }
+
         private MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator();
 
         private void LoadMenu()
@@ -190,7 +210,7 @@ namespace WpfUI.Views
             dc.DrawRectangle(new SolidColorBrush(MenuBackgroundColor), new Pen(Brushes.Black, 1.0 / scale), 
                 new Rect(0, 0, pageWidth, pageHeight));
                 
-            graphicsCreator.Start(new ScreenGraphicsContext(dc), ThemeColor, null);
+            graphicsCreator.Start(new ScreenGraphicsContext(dc), ThemeColor, null, MenuFontFamily);
             graphicsCreator.DrawMenu(ShowBorder, ShowOrnaments);
             graphicsCreator.End();
 

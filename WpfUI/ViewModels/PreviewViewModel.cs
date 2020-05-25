@@ -10,6 +10,7 @@ using WpfUI.MenuLibrary;
 using WpfUI.MenuLibrary.DataAccess;
 using WpfUI.MenuLibrary.Graphics;
 using Color = System.Windows.Media.Color;
+using FontFamily = System.Windows.Media.FontFamily;
 using WpfUI.Models;
 
 namespace WpfUI.ViewModels
@@ -37,6 +38,19 @@ namespace WpfUI.ViewModels
                 NotifyOfPropertyChange(() => SelectedColor);
             }
         }
+
+        private FontFamily _selectedFontFamily = new FontFamily("Times New Roman");
+        public FontFamily SelectedFontFamily 
+        { 
+            get { return _selectedFontFamily; }
+            set
+            {
+                _selectedFontFamily = value;
+                NotifyOfPropertyChange(() => SelectedFontFamily);
+            }
+        }
+
+        public ICollection<FontFamily> AllFontFamilies { get; } = Fonts.SystemFontFamilies;
 
         private string _selectedBackgroundColorName = "White";
         public string SelectedBackgroundColorName
@@ -135,14 +149,14 @@ namespace WpfUI.ViewModels
                     return;
                 }
 
-                MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator(SelectedMenu);
+                MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator();
                 graphicsCreator.LoadMenu(SelectedMenuId);
                 PDFGraphicsContext pgc = new PDFGraphicsContext(dialog.FileName);
 
                 pgc.DrawRectangle(0, 0, 595, 842, null, new SolidColorBrush(SelectedBackgroundColor), 1.0);
                 //pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
 
-                graphicsCreator.Start(pgc, SelectedColor, null);
+                graphicsCreator.Start(pgc, SelectedColor, null, SelectedFontFamily);
                 graphicsCreator.DrawMenu(ShowBorderSelected, ShowOrnamentsSelected);
                 graphicsCreator.End();
 

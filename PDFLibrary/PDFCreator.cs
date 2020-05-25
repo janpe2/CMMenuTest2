@@ -4,11 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Windows.Media;
 //using System.Windows.Media.Brush;
 
 namespace PDFLibrary
 {
-    public class PDFCreator
+    public class PDFCreator : IIndirectObjectCreator
     {
         private List<PDFObject> indirectObjects = new List<PDFObject>();
         private List<PDFDictionary> pageDictionaries = new List<PDFDictionary>();
@@ -20,16 +21,14 @@ namespace PDFLibrary
         private PDFArray pageKidsArray;
         private PDFDictionary pagesDictionary;
         private PDFDictionary currentPageResources;
+        private PDFDictionary currentPageFontResources;
         private PDFArray mediaBox;
-        private List<PDFDictionary> resourcesForEachPage = new List<PDFDictionary>();
         private string pdfFileName;
-        private PDFFont testfont; // TODO for font testing, remove
+        private Dictionary<Typeface, PDFFont> _fontMapping = new Dictionary<Typeface, PDFFont>();
 
         public PDFCreator(string pdfFileName)
         {
             this.pdfFileName = pdfFileName;
-
-            testfont = new PDFTrueTypeFont(CreateIndirectDictionary());
 
             pageKidsArray = CreateIndirectArray();
             mediaBox = new PDFArray(PDFObject.DirectObject,
@@ -64,20 +63,9 @@ namespace PDFLibrary
         /// </summary>
         public void AddPage()
         {
-            currentPageResources = CreateIndirectDictionary();
-            resourcesForEachPage.Add(currentPageResources);
-
-            PDFDictionary testFontRes = testfont.GetFontDictionary(); // CreateIndirectDictionary();
-            /*
-            testFontRes.Put("Type", new PDFName("Font"));
-            testFontRes.Put("Subtype", new PDFName("Type1"));
-            testFontRes.Put("BaseFont", new PDFName("Times-Roman"));
-            testFontRes.Put("Encoding", new PDFName("WinAnsiEncoding"));
-            */
-            
-            PDFDictionary fontResources = CreateIndirectDictionary();
-            fontResources.Put("F1", testFontRes);
-            currentPageResources.Put("Font", fontResources);
+            currentPageResources = CreateIndirectDictionary();            
+            currentPageFontResources = CreateIndirectDictionary();
+            currentPageResources.Put("Font", currentPageFontResources);
 
             currentContentStream = CreateContentStream(PDFStream.Filter.None);
             pageContentStreams.Add(currentContentStream);
@@ -95,20 +83,25 @@ namespace PDFLibrary
 
         private void WritePDFFile()
         {
-            long[] xref = new long[indirectObjects.Count];
+            List<long> xref = new List<long>();
 
             using (Stream stream = new FileStream(pdfFileName, FileMode.OpenOrCreate))
             {
                 stream.SetLength(0); // clear previous file contents
 
+                foreach (PDFFont font in _fontMapping.Values)
+                {
+                    font.Create(this);
+                    font.Write(stream);
+                }
+
                 // File header
                 PDFObject.WriteASCIIBytes("%PDF-1.5\r\n", stream);
                 WriteBinaryMarker(stream);
-                int i = 0;
 
                 foreach (PDFObject obj in indirectObjects)
                 {
-                    xref[i++] = stream.Position;
+                    xref.Add(stream.Position);
                     obj.Write(stream);
                 }
 
@@ -132,7 +125,7 @@ namespace PDFLibrary
             stream.Write(binMarker, 0, binMarker.Length);
         }
 
-        private void WriteXref(long[] xref, Stream stream)
+        private void WriteXref(List<long> xref, Stream stream)
         {
             PDFObject.WriteASCIIBytes(
                 $"xref\r\n0 {indirectObjects.Count + 1}\r\n0000000000 65535 f\r\n", stream);
@@ -149,35 +142,35 @@ namespace PDFLibrary
             return objectNumberCounter++;
         }
 
-        internal PDFDictionary CreateIndirectDictionary()
+        public PDFDictionary CreateIndirectDictionary()
         {
             PDFDictionary dict = new PDFDictionary(GetNextObjectNumber());
             indirectObjects.Add(dict);
             return dict;
         }
 
-        internal PDFArray CreateIndirectArray()
+        public PDFArray CreateIndirectArray()
         {
             PDFArray array = new PDFArray(GetNextObjectNumber());
             indirectObjects.Add(array);
             return array;
         }
 
-        internal PDFArray CreateIndirectArray(params double[] realValues)
+        public PDFArray CreateIndirectArray(params double[] realValues)
         {
             PDFArray array = new PDFArray(GetNextObjectNumber(), realValues);
             indirectObjects.Add(array);
             return array;
         }
 
-        internal PDFArray CreateIndirectArray(params int[] intValues)
+        public PDFArray CreateIndirectArray(params int[] intValues)
         {
             PDFArray array = new PDFArray(GetNextObjectNumber(), intValues);
             indirectObjects.Add(array);
             return array;
         }
 
-        internal PDFStream CreateStream(PDFStream.Filter filter)
+        public PDFStream CreateStream(PDFStream.Filter filter)
         {
             PDFStream stream = new PDFStream(GetNextObjectNumber(), filter);
             indirectObjects.Add(stream);
@@ -205,7 +198,10 @@ namespace PDFLibrary
             // Set actual number of objects
             trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
 
-            testfont.Create(this);
+            foreach (PDFFont f in _fontMapping.Values)
+            {
+                currentPageFontResources.Put($"F{f.ResourceKeyId}", f.GetFontDictionary());
+            }
 
             WritePDFFile();
         }
@@ -257,17 +253,26 @@ namespace PDFLibrary
             AppendToContentStream("S\r\n");
         }
 
-        public void DrawText(string text, string fontFamily, double fontSize, PDFColor color, 
+        public void DrawText(string text, Typeface typeface, double fontSize, PDFColor color, 
             double x, double y)
         {
-            testfont.AddStringToSubset(text);
+            PDFFont pdfFont;
+            if (!_fontMapping.TryGetValue(typeface, out pdfFont))
+            {
+                pdfFont = new PDFTrueTypeFont(CreateIndirectDictionary(), typeface);
+                _fontMapping[typeface] = pdfFont;
+                pdfFont.ResourceKeyId = _fontMapping.Count;
+            }
+            int fontKey = pdfFont.ResourceKeyId;
+            pdfFont.AddStringToSubset(text);
 
             // Let's create a temporary PDFString, which takes care of escaping special characters.
             PDFString str = new PDFString(text);
             WriteColor(color, false);
+
             AppendToContentStream(
                 "BT\r\n" +
-                $"  /F1 {PDFReal.RealToString(fontSize)} Tf\r\n" +
+                $"  /F{fontKey} {PDFReal.RealToString(fontSize)} Tf\r\n" +
                 $"  {PDFReal.RealToString(x)} {PDFReal.RealToString(-y)} Td\r\n" +
                 $"  {str.ToString()} Tj\r\n" +
                 "ET\r\n");

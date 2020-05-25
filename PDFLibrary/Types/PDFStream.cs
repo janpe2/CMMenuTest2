@@ -54,44 +54,49 @@ namespace PDFLibrary.Types
             return $"{ObjectNumber} 0 R";
         }
 
+        private byte[] GetDeflatedData()
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (DeflateStream deflate = new DeflateStream(memoryStream, CompressionMode.Compress))
+                {
+                    Data.Seek(0, SeekOrigin.Begin);
+                    Data.CopyTo(deflate);
+                    deflate.Close();
+                    return memoryStream.ToArray();
+                }
+            }
+        }
+
         public override void Write(Stream output)
         {
-            MemoryStream streamData;
             string filterName;
-            int length;
+            byte[] dataBytes;
 
             switch (filter)
             {
                 case Filter.Flate:
-                    /*
-                    // TODO Flate compression does not work yet
-                    streamData = new MemoryStream(1000);
-                    filterName = "FlateDecode";
-                    using (Stream deflateStream = new DeflateStream(streamData, CompressionMode.Compress))
-                    {
-                        Data.WriteTo(deflateStream);
-                        length = (int)streamData.Length; // get length before streamData is closed
-                    }
-                    break;
-                    */
+                    //dataBytes = GetDeflatedData();
+                    //filterName = "FlateDecode";
+                    //break;
                 case Filter.None:
-                    streamData = Data;
+                    dataBytes = Data.ToArray();
                     filterName = null;
-                    length = (int)Data.Length;
                     break;
                 default:
-                    throw new Exception("Invalid stream filter");
+                    throw new Exception($"Invalid stream filter {filter}");
             }
 
-            StreamDictionary.Put("Length", new PDFInt(length));
+            StreamDictionary.Put("Length", new PDFInt(dataBytes.Length));
             if (filterName != null)
             {
                 StreamDictionary.Put("Filter", new PDFName(filterName));
             }
 
             WriteASCIIBytes($"{ObjectNumber} 0 obj\r\n{StreamDictionary.ToString()}\r\nstream\r\n", output);
-            streamData.WriteTo(output);
+            output.Write(dataBytes, 0, dataBytes.Length);
             WriteASCIIBytes("\r\nendstream\r\nendobj\r\n\r\n", output);
         }
+
     }
 }

@@ -17,15 +17,11 @@ namespace WpfUI.MenuLibrary.Graphics
         private List<List<Dish>> dishes;
         private Brush themeColorBrush = Brushes.Red;
         private Brush pageBackground;
+        private FontFamily _fontFamily;
 
         public MenuGraphicsCreator()
         {
             
-        }
-
-        public MenuGraphicsCreator(Menu menu)
-        {
-            this.menu = menu;
         }
 
         public void LoadMenu(int menuId)
@@ -42,11 +38,13 @@ namespace WpfUI.MenuLibrary.Graphics
             }
         }
 
-        public void Start(IGraphicsContext gc, System.Windows.Media.Color themeColor, Brush pageBackground)
+        public void Start(IGraphicsContext gc, System.Windows.Media.Color themeColor, 
+            Brush pageBackground, FontFamily family)
         {
             this.gc = gc;
             this.pageBackground = pageBackground;
             themeColorBrush = new SolidColorBrush(themeColor);
+            this._fontFamily = family;
         }
 
         public void End()
@@ -60,18 +58,19 @@ namespace WpfUI.MenuLibrary.Graphics
             {
                 gc.DrawRectangle(20, 20, PageWidth, PageHeight, pageBackground, Brushes.Transparent, 4.0);
             }
-
-            FontFamily fontFamily = new FontFamily("Times New Roman");
-            Typeface menuNameFont = new Typeface(fontFamily, FontStyles.Italic, FontWeights.Bold, FontStretches.Normal);
-            if (menu == null)
+            if (_fontFamily == null)
             {
-                gc.DrawText("No Menu", menuNameFont, 36.0, themeColorBrush, 0, 75.0, true);
-                return;
+                _fontFamily = new FontFamily("Arial");
             }
 
-            Typeface dishNameFont = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            Typeface descrFont = new Typeface(fontFamily, FontStyles.Italic, FontWeights.Normal, FontStretches.Normal);
-            Typeface categoryNameFont = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
+            Typeface plainFont = new Typeface(_fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            Typeface boldFont = new Typeface(_fontFamily, FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
+
+            if (menu == null)
+            {
+                gc.DrawText("No Menu", boldFont, 36.0, themeColorBrush, 0, 75.0, true);
+                return;
+            }
 
             if (showBorder)
             {
@@ -86,8 +85,8 @@ namespace WpfUI.MenuLibrary.Graphics
                 gc.DrawCurve(549, 782, 480, 748, 399, 835, 358, 778, themeColorBrush, 2.0);
             }
 
-            gc.DrawText(menu.Name, menuNameFont, 36.0, themeColorBrush, 0, 75.0, true);
-            gc.DrawText(menu.Description, descrFont, 15.0, Brushes.Black, 0, 115.0, true);
+            gc.DrawText(menu.Name, boldFont, 36.0, themeColorBrush, 0, 75.0, true);
+            gc.DrawText(menu.Description, plainFont, 15.0, Brushes.Black, 0, 115.0, true);
             int category = 0;
 
             if (dishes != null && dishes.Count > 0)
@@ -97,15 +96,15 @@ namespace WpfUI.MenuLibrary.Graphics
                 {
                     if (dishesInCategory.Count > 0)
                     {
-                        gc.DrawText($"{(Menu.Category)category}", categoryNameFont, 16.0, Brushes.Black, 55.0, y, false);
+                        gc.DrawText($"{(Menu.Category)category}", boldFont, 16.0, Brushes.Black, 55.0, y, false);
                         y += 18;
                         gc.DrawLine(55, y, 530, y, themeColorBrush, 1.0);
                         y += 5;
                         foreach (Dish dish in dishesInCategory)
                         {
-                            gc.DrawText($"{dish.Name} {dish.Price}", dishNameFont, 14.0, Brushes.Black, 75.0, y, false);
+                            gc.DrawText($"{dish.Name} {dish.Price}", plainFont, 14.0, Brushes.Black, 75.0, y, false);
                             y += 16;
-                            gc.DrawText(dish.Description, descrFont, 12.0, Brushes.Gray, 75.0, y, false);
+                            gc.DrawText(dish.Description, plainFont, 12.0, Brushes.Gray, 75.0, y, false);
                             y += 17; 
                         }
                         y += 7;

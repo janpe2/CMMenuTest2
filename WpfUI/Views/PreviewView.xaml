@@ -21,7 +21,7 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,7">
+        <WrapPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,7">
             <TextBlock Text="Menu:" Margin="0,0,7,3" VerticalAlignment="Center"/>
 
             <ComboBox Name="Menus" DisplayMemberPath="Name" VerticalAlignment="Center"
@@ -55,6 +55,11 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
+            <TextBlock Text="Font:" Margin="5,0,7,3" VerticalAlignment="Center"/>
+
+            <ComboBox ItemsSource="{Binding AllFontFamilies}" DisplayMemberPath="Source"
+                      SelectedItem="{Binding SelectedFontFamily, Mode=TwoWay}" VerticalAlignment="Center" />
+
             <CheckBox Name="Border" Content="Border" Margin="6,0,0,0"
                       IsChecked="{Binding ShowBorderSelected, Mode=TwoWay}" VerticalAlignment="Center" />
 
@@ -63,7 +68,7 @@
 
             <Button Name="SavePDF" Content="Save PDF" Padding="3" Margin="6,0,0,0"/>
 
-        </StackPanel>
+        </WrapPanel>
 
         <PreviewerNamespace:PreviewerCustomControl Grid.Row="3" Grid.Column="1" BorderBrush="Black"
             MinWidth="100" MinHeight="100" x:Name="PreviewedMenu" 
@@ -71,7 +76,8 @@
             ShowBorder="{Binding ShowBorderSelected, Mode=TwoWay}"
             ShowOrnaments="{Binding ShowOrnamentsSelected, Mode=TwoWay}"
             ThemeColor="{Binding SelectedColor, Mode=TwoWay}"
-            MenuBackgroundColor="{Binding SelectedBackgroundColor, Mode=TwoWay}"/>
+            MenuBackgroundColor="{Binding SelectedBackgroundColor, Mode=TwoWay}"
+            MenuFontFamily="{Binding SelectedFontFamily, Mode=TwoWay}" />
 
     </Grid>
 </UserControl>
