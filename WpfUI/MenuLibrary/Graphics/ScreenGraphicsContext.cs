@@ -61,5 +61,15 @@ namespace WpfUI.MenuLibrary.Graphics
             }
             dc.DrawRectangle(fillBrush, new Pen(strokeBrush, lineWidth), new Rect(x, y, width, height));
         }
+
+        public void StartPage()
+        {
+
+        }
+
+        public void EndPage()
+        {
+
+        }
     }
 }

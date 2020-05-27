@@ -19,6 +19,17 @@ namespace WpfUI.ViewModels
     {
         public List<Menu> Menus { get; set; } = new List<Menu>();
 
+        private int _currentPageIndex;
+        public int CurrentPageIndex
+        {
+            get { return _currentPageIndex; }
+            set 
+            { 
+                _currentPageIndex = value;
+                NotifyOfPropertyChange(() => CurrentPageIndex);
+            }
+        }
+
         public List<string> AllColorNames { get; set; } = LoadColorNames();
 
         public Color SelectedColor { get; set; } = Colors.MediumBlue;
@@ -75,6 +86,7 @@ namespace WpfUI.ViewModels
             {
                 _selectedMenu = value;
                 SelectedMenuId = value.Id;
+                CurrentPageIndex = 0;
                 NotifyOfPropertyChange(() => SelectedMenu);
                 NotifyOfPropertyChange(() => SelectedMenuId);
             }
@@ -135,6 +147,19 @@ namespace WpfUI.ViewModels
             }
         }
 
+        public void NextPage()
+        {
+            CurrentPageIndex++;
+        }
+
+        public void PrevPage()
+        {
+            if (CurrentPageIndex > 0)
+            {
+                CurrentPageIndex--;
+            }
+        }
+
         public void SavePDF()
         {
             try
@@ -157,7 +182,7 @@ namespace WpfUI.ViewModels
                 //pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
 
                 graphicsCreator.Start(pgc, SelectedColor, null, SelectedFontFamily);
-                graphicsCreator.DrawMenu(ShowBorderSelected, ShowOrnamentsSelected);
+                graphicsCreator.DrawAllMenuPages(ShowBorderSelected, ShowOrnamentsSelected);
                 graphicsCreator.End();
 
                 pgc.Finish();

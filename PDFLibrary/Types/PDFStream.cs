@@ -58,13 +58,13 @@ namespace PDFLibrary.Types
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
-                using (DeflateStream deflate = new DeflateStream(memoryStream, CompressionMode.Compress))
+                using (DeflateStream deflate = new DeflateStream(memoryStream, CompressionMode.Compress, true))
                 {
                     Data.Seek(0, SeekOrigin.Begin);
                     Data.CopyTo(deflate);
-                    deflate.Close();
-                    return memoryStream.ToArray();
+                    // deflate.Close(); // does nothing
                 }
+                return memoryStream.ToArray();
             }
         }
 

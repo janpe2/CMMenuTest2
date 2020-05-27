@@ -20,8 +20,8 @@ namespace PDFLibrary
         private PDFStream currentContentStream;
         private PDFArray pageKidsArray;
         private PDFDictionary pagesDictionary;
-        private PDFDictionary currentPageResources;
-        private PDFDictionary currentPageFontResources;
+        private PDFDictionary _commonResources;
+        private PDFDictionary _commonFontResources;
         private PDFArray mediaBox;
         private string pdfFileName;
         private Dictionary<Typeface, PDFFont> _fontMapping = new Dictionary<Typeface, PDFFont>();
@@ -37,7 +37,7 @@ namespace PDFLibrary
             pagesDictionary = CreateIndirectDictionary();
             pagesDictionary.Put("Type", new PDFName("Pages"));
             pagesDictionary.Put("Kids", pageKidsArray);
-            //pagesDictionary.Put("Resources", resources); // all PDF pages inherit these resources
+            //pagesDictionary.Put("Resources", ); // all PDF pages would inherit these resources
 
             PDFDictionary catalog = CreateIndirectDictionary();
             catalog.Put("Type", new PDFName("Catalog"));
@@ -54,6 +54,10 @@ namespace PDFLibrary
             trailerDictionary.Put("ID", new PDFArray(PDFObject.DirectObject, fileIdString, fileIdString));
             trailerDictionary.Put("Info", infoDictionary);
 
+            _commonResources = CreateIndirectDictionary();
+            _commonFontResources = CreateIndirectDictionary();
+            _commonResources.Put("Font", _commonFontResources);
+
             // PDF must have at least one page
             AddPage(); 
         }
@@ -63,10 +67,6 @@ namespace PDFLibrary
         /// </summary>
         public void AddPage()
         {
-            currentPageResources = CreateIndirectDictionary();            
-            currentPageFontResources = CreateIndirectDictionary();
-            currentPageResources.Put("Font", currentPageFontResources);
-
             currentContentStream = CreateContentStream(PDFStream.Filter.None);
             pageContentStreams.Add(currentContentStream);
 
@@ -75,7 +75,7 @@ namespace PDFLibrary
             currentPageDictionary.Put("Parent", pagesDictionary);
             currentPageDictionary.Put("Contents", currentContentStream);
             currentPageDictionary.Put("MediaBox", mediaBox);
-            currentPageDictionary.Put("Resources", currentPageResources);
+            currentPageDictionary.Put("Resources", _commonResources);
 
             pageDictionaries.Add(currentPageDictionary);
             pageKidsArray.Array.Add(currentPageDictionary);            
@@ -91,7 +91,6 @@ namespace PDFLibrary
 
                 foreach (PDFFont font in _fontMapping.Values)
                 {
-                    font.Create(this);
                     font.Write(stream);
                 }
 
@@ -198,9 +197,10 @@ namespace PDFLibrary
             // Set actual number of objects
             trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
 
-            foreach (PDFFont f in _fontMapping.Values)
+            foreach (PDFFont font in _fontMapping.Values)
             {
-                currentPageFontResources.Put($"F{f.ResourceKeyId}", f.GetFontDictionary());
+                font.CreatePDFData(this);
+                _commonFontResources.Put($"F{font.ResourceKeyId}", font.GetFontDictionary());
             }
 
             WritePDFFile();

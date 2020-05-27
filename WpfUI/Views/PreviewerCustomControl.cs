@@ -97,6 +97,15 @@ namespace WpfUI.Views
                     FrameworkPropertyMetadataOptions.AffectsRender)
                 );
 
+        public static readonly DependencyProperty CurrentPageIndexProperty =
+            DependencyProperty.Register(
+                "CurrentPageIndex", typeof(int), typeof(PreviewerCustomControl),
+                new FrameworkPropertyMetadata(
+                    default(int), 
+                    FrameworkPropertyMetadataOptions.AffectsRender, 
+                    new PropertyChangedCallback(MenuIdPropertyChanged))
+                );
+
         public int MenuId
         {
             get 
@@ -106,6 +115,18 @@ namespace WpfUI.Views
             set 
             { 
                 SetValue(MenuIdProperty, value);
+            }
+        }
+
+        public int CurrentPageIndex
+        {
+            get 
+            { 
+                return (int)GetValue(CurrentPageIndexProperty); 
+            }
+            set 
+            { 
+                SetValue(CurrentPageIndexProperty, value);
             }
         }
 
@@ -211,7 +232,7 @@ namespace WpfUI.Views
                 new Rect(0, 0, pageWidth, pageHeight));
                 
             graphicsCreator.Start(new ScreenGraphicsContext(dc), ThemeColor, null, MenuFontFamily);
-            graphicsCreator.DrawMenu(ShowBorder, ShowOrnaments);
+            graphicsCreator.DrawMenuPage(CurrentPageIndex, ShowBorder, ShowOrnaments);
             graphicsCreator.End();
 
             dc.Pop(); // pop transform

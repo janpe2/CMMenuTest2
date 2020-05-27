@@ -17,15 +17,24 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <WrapPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,7">
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,7">
+
             <TextBlock Text="Menu:" Margin="0,0,7,3" VerticalAlignment="Center"/>
 
             <ComboBox Name="Menus" DisplayMemberPath="Name" VerticalAlignment="Center"
-                      SelectedItem="{Binding SelectedMenu, Mode=TwoWay}"/>
+                      SelectedItem="{Binding SelectedMenu, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+            <Button Name="PrevPage" Content="&lt; Prev Page" Padding="3" />
+            <Button Name="NextPage" Content="Next Page &gt;" Padding="3" Margin="6,0,6,0" />
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,7">
 
             <TextBlock Text="Color:" Margin="5,0,7,3" VerticalAlignment="Center"/>
 
@@ -68,16 +77,17 @@
 
             <Button Name="SavePDF" Content="Save PDF" Padding="3" Margin="6,0,0,0"/>
 
-        </WrapPanel>
+        </StackPanel>
 
-        <PreviewerNamespace:PreviewerCustomControl Grid.Row="3" Grid.Column="1" BorderBrush="Black"
+        <PreviewerNamespace:PreviewerCustomControl Grid.Row="4" Grid.Column="1" BorderBrush="Black"
             MinWidth="100" MinHeight="100" x:Name="PreviewedMenu" 
             MenuId="{Binding SelectedMenuId, Mode=TwoWay}"
             ShowBorder="{Binding ShowBorderSelected, Mode=TwoWay}"
             ShowOrnaments="{Binding ShowOrnamentsSelected, Mode=TwoWay}"
             ThemeColor="{Binding SelectedColor, Mode=TwoWay}"
             MenuBackgroundColor="{Binding SelectedBackgroundColor, Mode=TwoWay}"
-            MenuFontFamily="{Binding SelectedFontFamily, Mode=TwoWay}" />
+            MenuFontFamily="{Binding SelectedFontFamily, Mode=TwoWay}"
+            CurrentPageIndex="{Binding CurrentPageIndex, Mode=TwoWay}" />
 
     </Grid>
 </UserControl>

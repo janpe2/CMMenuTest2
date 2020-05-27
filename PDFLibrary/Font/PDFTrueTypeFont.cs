@@ -69,7 +69,7 @@ namespace PDFLibrary.Font
             return glyphTypeface;
         }
 
-        public override void Create(IIndirectObjectCreator creator)
+        public override void CreatePDFData(IIndirectObjectCreator creator)
         {
             if (firstChar > lastChar)
             {
@@ -77,10 +77,6 @@ namespace PDFLibrary.Font
             }
 
             PDFName postScriptFontName = CreatePostScriptFontName(_typeface);
-            FontStyle style = _typeface.Style;
-            double italicAngle =
-                (style == FontStyles.Italic || style == FontStyles.Oblique) ? -12.0 : 0.0; // TODO just a guess
-
             GlyphTypeface glyphTypeface = CreateGlyphTypeface();
             IDictionary<int, ushort> cmap = glyphTypeface.CharacterToGlyphMap;
 
@@ -88,18 +84,13 @@ namespace PDFLibrary.Font
             fontDescriptor.Put("Type", new PDFName("FontDescriptor"));
             fontDescriptor.Put("FontName", postScriptFontName);
             fontDescriptor.Put("Flags", new PDFInt(4)); // symbolic
-            fontDescriptor.Put("StemV", new PDFInt(100));
             fontDescriptor.Put("MissingWidth", new PDFInt(250));
-            fontDescriptor.Put("FontBBox", GetFontBBox(glyphTypeface, creator));
-            fontDescriptor.Put("ItalicAngle", new PDFReal(italicAngle));
-            fontDescriptor.Put("Ascent", new PDFReal(1000 * glyphTypeface.Baseline));
-            fontDescriptor.Put("Descent", new PDFReal(-250.0)); // TODO just a guess
-            fontDescriptor.Put("CapHeight", new PDFInt((int)(1000 * glyphTypeface.CapsHeight)));
+            AddFontMetrics(fontDescriptor, glyphTypeface, creator);
 
             fontDictionary.Put("Type", new PDFName("Font"));
             fontDictionary.Put("Subtype", new PDFName("TrueType"));
             fontDictionary.Put("BaseFont", postScriptFontName);
-            // fontDescr.Put("Encoding", ); // omit Encoding
+            // fontDescr.Put("Encoding", ); // Encoding should be omitted in embedded TrueType fonts
             fontDictionary.Put("FontDescriptor", fontDescriptor);
             fontDictionary.Put("Widths", GetWidths(glyphTypeface, creator, cmap));
             fontDictionary.Put("FirstChar", new PDFInt(firstChar));
@@ -200,7 +191,8 @@ namespace PDFLibrary.Font
             }
         }
 
-        private PDFArray GetFontBBox(GlyphTypeface glyphTypeface, IIndirectObjectCreator creator)
+        private void AddFontMetrics(PDFDictionary fontDescriptor, GlyphTypeface glyphTypeface, 
+            IIndirectObjectCreator creator)
         {
             // We must parse the 'head' table of the font file to get FontBBox.
             // The result is actually the FontBBox of the whole font, not that of the subset font.
@@ -249,12 +241,27 @@ namespace PDFLibrary.Font
                 int right = ReadInt16(stream);
                 int top = ReadInt16(stream);
 
+                // Convert to font size 1000
+                left = (int)Math.Floor(1000.0 * left / unitsPerEm);
+                bottom = (int)Math.Floor(1000.0 * bottom / unitsPerEm);
+                right = (int)Math.Ceiling(1000.0 * right / unitsPerEm);
+                top = (int)Math.Ceiling(1000.0 * top / unitsPerEm);
+
                 PDFArray fontBBox = new PDFArray(PDFObject.DirectObject);
-                fontBBox.Array.Add(new PDFInt((int)Math.Floor(1000.0 * left / unitsPerEm)));
-                fontBBox.Array.Add(new PDFInt((int)Math.Floor(1000.0 * bottom / unitsPerEm)));
-                fontBBox.Array.Add(new PDFInt((int)Math.Ceiling(1000.0 * right / unitsPerEm)));
-                fontBBox.Array.Add(new PDFInt((int)Math.Ceiling(1000.0 * top / unitsPerEm)));
-                return fontBBox;
+                fontBBox.Array.Add(new PDFInt(left));
+                fontBBox.Array.Add(new PDFInt(bottom));
+                fontBBox.Array.Add(new PDFInt(right));
+                fontBBox.Array.Add(new PDFInt(top));
+
+                fontDescriptor.Put("FontBBox", fontBBox);
+                fontDescriptor.Put("Descent", new PDFInt(bottom));
+                fontDescriptor.Put("Ascent", new PDFInt((int)(1000 * glyphTypeface.Baseline)));
+                fontDescriptor.Put("CapHeight", new PDFInt((int)(1000 * glyphTypeface.CapsHeight)));
+                fontDescriptor.Put("StemV", new PDFInt(90)); // just a guess
+                FontStyle style = _typeface.Style;
+                double italicAngle =
+                    (style == FontStyles.Italic || style == FontStyles.Oblique) ? -12.0 : 0.0; // just a guess
+                fontDescriptor.Put("ItalicAngle", new PDFReal(italicAngle));
             }
         }
     }

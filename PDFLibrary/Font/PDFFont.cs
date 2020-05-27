@@ -49,7 +49,7 @@ namespace PDFLibrary.Font
             return fontDictionary;
         }
 
-        public abstract void Create(IIndirectObjectCreator creator);
+        public abstract void CreatePDFData(IIndirectObjectCreator creator);
 
         public abstract void Write(Stream stream);
 

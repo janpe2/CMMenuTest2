@@ -13,7 +13,7 @@ namespace WpfUI.MenuLibrary.Graphics
     public class PDFGraphicsContext : IGraphicsContext
     {
         private PDFCreator pdfCreator;
-
+        private int _pageIndex = 0;
 
         public PDFGraphicsContext(string filePath)
         {
@@ -77,6 +77,20 @@ namespace WpfUI.MenuLibrary.Graphics
             }
 
             return new PDFColor(0, 0, 0); // black
+        }
+
+        public void StartPage()
+        {
+            if (_pageIndex > 0)
+            {
+                pdfCreator.AddPage();
+            }
+            _pageIndex++;
+        }
+
+        public void EndPage()
+        {
+
         }
     }
 }
