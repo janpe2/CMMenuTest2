@@ -102,8 +102,14 @@ namespace WpfUI.Views
                 "CurrentPageIndex", typeof(int), typeof(PreviewerCustomControl),
                 new FrameworkPropertyMetadata(
                     default(int), 
-                    FrameworkPropertyMetadataOptions.AffectsRender, 
-                    new PropertyChangedCallback(MenuIdPropertyChanged))
+                    FrameworkPropertyMetadataOptions.AffectsRender)
+                );
+
+        public static readonly DependencyProperty GraphicsCreatorProperty =
+            DependencyProperty.Register(
+                "GraphicsCreator", typeof(MenuGraphicsCreator), typeof(PreviewerCustomControl),
+                new FrameworkPropertyMetadata(
+                    default(MenuGraphicsCreator))
                 );
 
         public int MenuId
@@ -130,6 +136,17 @@ namespace WpfUI.Views
             }
         }
 
+        public MenuGraphicsCreator GraphicsCreator
+        {
+            get 
+            { 
+                return (MenuGraphicsCreator)GetValue(GraphicsCreatorProperty); 
+            }
+            set 
+            { 
+                SetValue(GraphicsCreatorProperty, value);
+            }
+        }
         public bool ShowBorder
         {
             get
@@ -190,11 +207,12 @@ namespace WpfUI.Views
             }
         }
 
-        private MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator();
-
         private void LoadMenu()
         {
-            graphicsCreator.LoadMenu(MenuId);
+            if (GraphicsCreator != null)
+            {
+                GraphicsCreator.LoadMenu(MenuId);
+            }
         }
 
         static void MenuIdPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
@@ -228,12 +246,16 @@ namespace WpfUI.Views
 
             dc.PushTransform(new MatrixTransform(scale, 0, 0, scale, translateX, translateY));
 
-            dc.DrawRectangle(new SolidColorBrush(MenuBackgroundColor), new Pen(Brushes.Black, 1.0 / scale), 
+            if (GraphicsCreator != null)
+            {
+                GraphicsCreator.Start(new ScreenGraphicsContext(dc), ThemeColor,
+                        new SolidColorBrush(MenuBackgroundColor), MenuFontFamily);
+                GraphicsCreator.DrawMenuPage(CurrentPageIndex, ShowBorder, ShowOrnaments);
+                GraphicsCreator.End(); 
+            }
+
+            dc.DrawRectangle(Brushes.Transparent, new Pen(Brushes.Black, 1.0 / scale), 
                 new Rect(0, 0, pageWidth, pageHeight));
-                
-            graphicsCreator.Start(new ScreenGraphicsContext(dc), ThemeColor, null, MenuFontFamily);
-            graphicsCreator.DrawMenuPage(CurrentPageIndex, ShowBorder, ShowOrnaments);
-            graphicsCreator.End();
 
             dc.Pop(); // pop transform
         }

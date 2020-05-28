@@ -10,6 +10,7 @@ namespace PDFLibrary.Font
 {
     public class PDFTrueTypeFont : PDFFont
     {
+        private const bool IsSymbolic = false;
         private Typeface _typeface;
 
         public PDFTrueTypeFont(PDFDictionary fontDictionary, Typeface typeface) :
@@ -83,14 +84,17 @@ namespace PDFLibrary.Font
             fontDescriptor = creator.CreateIndirectDictionary();
             fontDescriptor.Put("Type", new PDFName("FontDescriptor"));
             fontDescriptor.Put("FontName", postScriptFontName);
-            fontDescriptor.Put("Flags", new PDFInt(4)); // symbolic
+            fontDescriptor.Put("Flags", new PDFInt(IsSymbolic ? 4 : 32));
             fontDescriptor.Put("MissingWidth", new PDFInt(250));
             AddFontMetrics(fontDescriptor, glyphTypeface, creator);
 
             fontDictionary.Put("Type", new PDFName("Font"));
             fontDictionary.Put("Subtype", new PDFName("TrueType"));
             fontDictionary.Put("BaseFont", postScriptFontName);
-            // fontDescr.Put("Encoding", ); // Encoding should be omitted in embedded TrueType fonts
+            if (!IsSymbolic)
+            {
+                fontDictionary.Put("Encoding", new PDFName("WinAnsiEncoding"));
+            }
             fontDictionary.Put("FontDescriptor", fontDescriptor);
             fontDictionary.Put("Widths", GetWidths(glyphTypeface, creator, cmap));
             fontDictionary.Put("FirstChar", new PDFInt(firstChar));
@@ -185,8 +189,9 @@ namespace PDFLibrary.Font
                     break;
                 case 0x74727565: // 'true' = TrueType Apple
                     break;
+                case 0x4F54544F: // 'OTTO'
+                    throw new IOException("OpenType CFF font is not supported");
                 default:
-                    // TODO TTC is not supported
                     throw new IOException("Unsupported sfnt version in font");
             }
         }

@@ -24,7 +24,6 @@ namespace WpfUI.MenuLibrary.Graphics
 
         public MenuGraphicsCreator()
         {
-            
 
         }
 
@@ -40,6 +39,14 @@ namespace WpfUI.MenuLibrary.Graphics
             catch (Exception)
             {
 
+            }
+        }
+
+        public int PageCount 
+        { 
+            get
+            {
+                return _menuPages.Count;
             }
         }
 
@@ -75,7 +82,7 @@ namespace WpfUI.MenuLibrary.Graphics
             {
                 if (_pageBackgroundBrush != null)
                 {
-                    _gc.DrawRectangle(20, 20, PageWidth, PageHeight, _pageBackgroundBrush, Brushes.Transparent, 4.0);
+                    _gc.DrawRectangle(0, 0, PageWidth, PageHeight, Brushes.Transparent, _pageBackgroundBrush, 1.0);
                 }
                 if (_fontFamily == null)
                 {

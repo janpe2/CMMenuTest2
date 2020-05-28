@@ -81,6 +81,26 @@ namespace PDFLibrary
             pageKidsArray.Array.Add(currentPageDictionary);            
         }
 
+        /// <summary>
+        /// Finishes PDF creation and writes all PDF objects to the specified file.
+        /// This must be called as the final step when creating a PDF.
+        /// </summary>
+        public void Finish()
+        {
+            // Set actual page count
+            pagesDictionary.Put("Count", new PDFInt(pageDictionaries.Count));
+            // Set actual number of objects
+            trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
+
+            foreach (PDFFont font in _fontMapping.Values)
+            {
+                font.CreatePDFData(this);
+                _commonFontResources.Put($"F{font.ResourceKeyId}", font.GetFontDictionary());
+            }
+
+            WritePDFFile();
+        }
+
         private void WritePDFFile()
         {
             List<long> xref = new List<long>();
@@ -89,14 +109,14 @@ namespace PDFLibrary
             {
                 stream.SetLength(0); // clear previous file contents
 
+                // File header
+                PDFObject.WriteASCIIBytes("%PDF-1.5\r\n", stream);
+                WriteBinaryMarker(stream);
+
                 foreach (PDFFont font in _fontMapping.Values)
                 {
                     font.Write(stream);
                 }
-
-                // File header
-                PDFObject.WriteASCIIBytes("%PDF-1.5\r\n", stream);
-                WriteBinaryMarker(stream);
 
                 foreach (PDFObject obj in indirectObjects)
                 {
@@ -184,26 +204,6 @@ namespace PDFLibrary
             stream.WriteData("1 0 0 1 0 841.8898 cm\r\n");
 
             return stream;
-        }
-
-        /// <summary>
-        /// Finishes PDF creation and writes all PDF objects to the specified file.
-        /// This must be called as the final step when creating a PDF.
-        /// </summary>
-        public void Finish()
-        {
-            // Set actual page count
-            pagesDictionary.Put("Count", new PDFInt(pageDictionaries.Count));
-            // Set actual number of objects
-            trailerDictionary.Put("Size", new PDFInt(indirectObjects.Count + 1));
-
-            foreach (PDFFont font in _fontMapping.Values)
-            {
-                font.CreatePDFData(this);
-                _commonFontResources.Put($"F{font.ResourceKeyId}", font.GetFontDictionary());
-            }
-
-            WritePDFFile();
         }
 
         public void DrawRectangle(double x, double y, double width, double height,

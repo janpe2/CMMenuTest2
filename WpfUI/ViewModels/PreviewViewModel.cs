@@ -12,6 +12,8 @@ using WpfUI.MenuLibrary.Graphics;
 using Color = System.Windows.Media.Color;
 using FontFamily = System.Windows.Media.FontFamily;
 using WpfUI.Models;
+using System.Windows.Controls;
+using Menu = WpfUI.Models.Menu;
 
 namespace WpfUI.ViewModels
 {
@@ -19,14 +21,36 @@ namespace WpfUI.ViewModels
     {
         public List<Menu> Menus { get; set; } = new List<Menu>();
 
+        private MenuGraphicsCreator _graphicsCreator = new MenuGraphicsCreator();
+        public MenuGraphicsCreator CurrentGraphicsCreator 
+        {
+            get
+            {
+                return _graphicsCreator;
+            }
+        }
+
         private int _currentPageIndex;
         public int CurrentPageIndex
         {
-            get { return _currentPageIndex; }
-            set 
+            get 
             { 
+                return _currentPageIndex; 
+            }
+            set
+            {
                 _currentPageIndex = value;
                 NotifyOfPropertyChange(() => CurrentPageIndex);
+                PageLabelText = $"Page {CurrentPageIndex + 1} of {MenuPagesMaxIndex + 1}";
+                NotifyOfPropertyChange(() => PageLabelText);
+            }
+        }
+
+        public int MenuPagesMaxIndex
+        {
+            get
+            {
+                return (_graphicsCreator.PageCount == 0) ? 0 : _graphicsCreator.PageCount - 1;
             }
         }
 
@@ -36,10 +60,10 @@ namespace WpfUI.ViewModels
         public Color SelectedBackgroundColor { get; set; } = Colors.White;
 
         private string _selectedColorName = "MediumBlue";
-        public string SelectedColorName 
-        { 
-            get 
-            { 
+        public string SelectedColorName
+        {
+            get
+            {
                 return _selectedColorName;
             }
             set
@@ -51,9 +75,12 @@ namespace WpfUI.ViewModels
         }
 
         private FontFamily _selectedFontFamily = new FontFamily("Times New Roman");
-        public FontFamily SelectedFontFamily 
-        { 
-            get { return _selectedFontFamily; }
+        public FontFamily SelectedFontFamily
+        {
+            get
+            {
+                return _selectedFontFamily;
+            }
             set
             {
                 _selectedFontFamily = value;
@@ -61,7 +88,14 @@ namespace WpfUI.ViewModels
             }
         }
 
-        public ICollection<FontFamily> AllFontFamilies { get; } = Fonts.SystemFontFamilies;
+        public ICollection<FontFamily> AllFontFamilies { get; } = GetSystemFontFamilies();
+
+        private static ICollection<FontFamily> GetSystemFontFamilies()
+        {
+            List<FontFamily> list = new List<FontFamily>(Fonts.SystemFontFamilies);
+            list.Sort((a, b) => { return a.Source.CompareTo(b.Source); });
+            return list;
+        }
 
         private string _selectedBackgroundColorName = "White";
         public string SelectedBackgroundColorName
@@ -80,8 +114,11 @@ namespace WpfUI.ViewModels
 
         private Menu _selectedMenu;
         public Menu SelectedMenu
-        { 
-            get { return _selectedMenu;  } 
+        {
+            get
+            {
+                return _selectedMenu;
+            }
             set
             {
                 _selectedMenu = value;
@@ -89,14 +126,18 @@ namespace WpfUI.ViewModels
                 CurrentPageIndex = 0;
                 NotifyOfPropertyChange(() => SelectedMenu);
                 NotifyOfPropertyChange(() => SelectedMenuId);
+                NotifyOfPropertyChange(() => MenuPagesMaxIndex);
             }
         }
 
         private bool _showBorderSelected = true;
         public bool ShowBorderSelected
         {
-            get { return _showBorderSelected; }
-            set 
+            get
+            {
+                return _showBorderSelected;
+            }
+            set
             {
                 _showBorderSelected = value;
                 NotifyOfPropertyChange(() => ShowBorderSelected);
@@ -104,9 +145,13 @@ namespace WpfUI.ViewModels
         }
 
         private bool _showOrnamentsSelected = true;
+
         public bool ShowOrnamentsSelected
         {
-            get { return _showOrnamentsSelected; }
+            get
+            {
+                return _showOrnamentsSelected;
+            }
             set
             {
                 _showOrnamentsSelected = value;
@@ -114,7 +159,21 @@ namespace WpfUI.ViewModels
             }
         }
 
-        public int SelectedMenuId { get; set; }
+        private int _selectedMenuId;
+        public int SelectedMenuId
+        {
+            get 
+            { 
+                return _selectedMenuId; 
+            }
+            set
+            {
+                _selectedMenuId = value;
+                _graphicsCreator.LoadMenu(_selectedMenuId);
+            }
+        }
+
+        public string PageLabelText { get; set; } = "Page 1 of 1";
 
         public PreviewViewModel()
         {
@@ -147,19 +206,6 @@ namespace WpfUI.ViewModels
             }
         }
 
-        public void NextPage()
-        {
-            CurrentPageIndex++;
-        }
-
-        public void PrevPage()
-        {
-            if (CurrentPageIndex > 0)
-            {
-                CurrentPageIndex--;
-            }
-        }
-
         public void SavePDF()
         {
             try
@@ -174,16 +220,12 @@ namespace WpfUI.ViewModels
                     return;
                 }
 
-                MenuGraphicsCreator graphicsCreator = new MenuGraphicsCreator();
-                graphicsCreator.LoadMenu(SelectedMenuId);
                 PDFGraphicsContext pgc = new PDFGraphicsContext(dialog.FileName);
 
-                pgc.DrawRectangle(0, 0, 595, 842, null, new SolidColorBrush(SelectedBackgroundColor), 1.0);
-                //pgc.DrawRectangle(50, 200, 300, 150, new SolidColorBrush(SelectedColor), null, 3.0);
-
-                graphicsCreator.Start(pgc, SelectedColor, null, SelectedFontFamily);
-                graphicsCreator.DrawAllMenuPages(ShowBorderSelected, ShowOrnamentsSelected);
-                graphicsCreator.End();
+                _graphicsCreator.Start(pgc, SelectedColor,
+                    new SolidColorBrush(SelectedBackgroundColor), SelectedFontFamily);
+                _graphicsCreator.DrawAllMenuPages(ShowBorderSelected, ShowOrnamentsSelected);
+                _graphicsCreator.End();
 
                 pgc.Finish();
             }
@@ -191,7 +233,7 @@ namespace WpfUI.ViewModels
             {
                 MessageBox.Show("Failed to save PDF.\n" + ex, "Error");
             }
-            
+
         }
     }
 }

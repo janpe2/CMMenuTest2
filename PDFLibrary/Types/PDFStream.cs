@@ -58,6 +58,12 @@ namespace PDFLibrary.Types
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
+                // DeflateStream implements RFC 1951 but PDF expects RFC 1950.
+                // Write two header bytes that are expected in PDF.
+                // This does not work!
+                memoryStream.WriteByte(0x78);
+                memoryStream.WriteByte(0x9C);
+
                 using (DeflateStream deflate = new DeflateStream(memoryStream, CompressionMode.Compress, true))
                 {
                     Data.Seek(0, SeekOrigin.Begin);
