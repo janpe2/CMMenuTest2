@@ -80,13 +80,14 @@ namespace PDFLibrary.Font
             PDFName postScriptFontName = CreatePostScriptFontName(_typeface);
             GlyphTypeface glyphTypeface = CreateGlyphTypeface();
             IDictionary<int, ushort> cmap = glyphTypeface.CharacterToGlyphMap;
+            byte[] subsetData = CreateSubsetData(glyphTypeface, cmap);
 
             fontDescriptor = creator.CreateIndirectDictionary();
             fontDescriptor.Put("Type", new PDFName("FontDescriptor"));
             fontDescriptor.Put("FontName", postScriptFontName);
             fontDescriptor.Put("Flags", new PDFInt(IsSymbolic ? 4 : 32));
             fontDescriptor.Put("MissingWidth", new PDFInt(250));
-            AddFontMetrics(fontDescriptor, glyphTypeface, creator);
+            AddFontMetrics(fontDescriptor, glyphTypeface, subsetData);
 
             fontDictionary.Put("Type", new PDFName("Font"));
             fontDictionary.Put("Subtype", new PDFName("TrueType"));
@@ -103,9 +104,8 @@ namespace PDFLibrary.Font
 
             fontStream = creator.CreateStream(PDFStream.Filter.Flate);
             fontDescriptor.Put("FontFile2", fontStream);
-            byte[] data = CreateSubsetData(glyphTypeface, cmap);
-            fontStream.Data.Write(data, 0, data.Length);
-            fontStream.StreamDictionary.Put("Length1", new PDFInt(data.Length));
+            fontStream.Data.Write(subsetData, 0, subsetData.Length);
+            fontStream.StreamDictionary.Put("Length1", new PDFInt(subsetData.Length));
         }
 
         public override void Write(Stream stream)
@@ -185,24 +185,29 @@ namespace PDFLibrary.Font
         {
             switch (ReadInt32(stream))
             {
-                case 0x00010000: // 1.0 (Fixed) = TrueType Windows
+                case 0x00010000: 
+                    // 1.0 (Fixed) = TrueType Windows
                     break;
-                case 0x74727565: // 'true' = TrueType Apple
+                case 0x74727565: 
+                    // 'true' = TrueType Apple
                     break;
-                case 0x4F54544F: // 'OTTO'
+                case 0x4F54544F: 
+                    // 'OTTO'
                     throw new IOException("OpenType CFF font is not supported");
+                case 0x74746366:
+                    // 'ttcf'
+                    throw new IOException("TTC font collection is not supported");
                 default:
                     throw new IOException("Unsupported sfnt version in font");
             }
         }
 
         private void AddFontMetrics(PDFDictionary fontDescriptor, GlyphTypeface glyphTypeface, 
-            IIndirectObjectCreator creator)
+            byte[] subsetData)
         {
             // We must parse the 'head' table of the font file to get FontBBox.
-            // The result is actually the FontBBox of the whole font, not that of the subset font.
 
-            using (Stream stream = glyphTypeface.GetFontStream())
+            using (Stream stream = new MemoryStream(subsetData))
             {
                 ReadSfntVersion(stream);
 
